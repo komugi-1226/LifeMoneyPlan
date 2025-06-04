@@ -140,10 +140,10 @@
     --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.1);
     
     /* アニメーション */
---transition-fast: none;
---transition-base: none;
---transition-slow: none;
---transition-slower: none;
+--transition-fast: 0.15s ease;
+--transition-base: 0.3s ease;
+--transition-slow: 0.5s ease;
+--transition-slower: 0.8s ease;
     
     /* ブレークポイント */
     --breakpoint-sm: 640px;
