@@ -2673,6 +2673,8 @@ const AppInitializer = {
         window.calculateResults = () => CalculationEngine.calculate();
         window.resetApp = () => this.resetApplication();
         window.exportResults = () => this.exportResults();
+        window.downloadChartImage = () => ResultsManager.downloadChartImage();
+        window.shareResults = () => ResultsManager.shareResults();
         window.saveSettings = () => {
             if (StorageManager.save(appState)) {
                 NotificationManager.show('設定を保存しました', 'success');
@@ -3036,6 +3038,60 @@ const AppInitializer = {
         doc.save(`生涯収支シミュレーション結果_${new Date().toISOString().slice(0, 10)}.pdf`);
 
         NotificationManager.show('結果をPDFファイルとしてエクスポートしました', 'success');
+    },
+
+    downloadChartImage() {
+        try {
+            const canvas = Utils.getElement('lifetimeChart', false);
+            if (!canvas || !lifetimeChart) {
+                NotificationManager.show('まずシミュレーションを実行してください', 'error');
+                return;
+            }
+
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `生涯収支グラフ_${new Date().toISOString().slice(0, 10)}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            NotificationManager.show('グラフ画像をダウンロードしました', 'success');
+        } catch (error) {
+            Utils.handleError(error, 'Chart image download');
+        }
+    },
+
+    shareResults() {
+        try {
+            if (!appState.results.yearlyData || appState.results.yearlyData.length === 0) {
+                NotificationManager.show('まずシミュレーションを実行してください', 'error');
+                return;
+            }
+
+            const url = window.location.href;
+            const balance = Utils.formatCurrency(appState.results.finalBalance);
+            const text = `人生おかね診断の結果は${balance}でした！`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '人生おかね診断',
+                    text,
+                    url
+                }).catch(err => console.error('Share failed', err));
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                    NotificationManager.show('共有リンクをコピーしました', 'success');
+                }).catch(err => {
+                    console.error('Clipboard write failed', err);
+                    NotificationManager.show('共有に失敗しました', 'error');
+                });
+            } else {
+                NotificationManager.show('このブラウザでは共有機能がサポートされていません', 'error');
+            }
+        } catch (error) {
+            Utils.handleError(error, 'Share results');
+        }
     }
 };
 
