@@ -1,17 +1,17 @@
 /* ===== CSS変数（デザインシステム） ===== */
 :root {
-    /* カラーパレット - より洗練された色使い */
-    --color-primary: #2563eb;
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
+    /* カラーパレット - プレミアムで洗練された色使い */
+    --color-primary: #667eea;
+    --color-primary-50: #f0f4ff;
+    --color-primary-100: #e0e9ff;
+    --color-primary-200: #c7d6fe;
+    --color-primary-300: #a5b8fc;
+    --color-primary-400: #8b94f8;
+    --color-primary-500: #667eea;
+    --color-primary-600: #5a67d8;
+    --color-primary-700: #4c51bf;
+    --color-primary-800: #434190;
+    --color-primary-900: #3c366b;
     
     --color-secondary: #64748b;
     --color-secondary-50: #f8fafc;
@@ -167,14 +167,31 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: linear-gradient(to bottom, var(--color-secondary-50), var(--color-secondary-100));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-attachment: fixed;
     color: var(--color-text-primary);
     line-height: var(--leading-normal);
     min-height: 100vh;
     font-size: var(--text-base);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* スクリーンリーダー専用テキスト */
@@ -202,13 +219,35 @@ body {
 .header {
     text-align: center;
     margin-bottom: var(--space-16);
-    padding: var(--space-12) var(--space-8);
-    background: var(--color-surface);
+    padding: var(--space-16) var(--space-8);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     border-radius: var(--radius-3xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border-light);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
+    animation: headerGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes headerGlow {
+    0% { 
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.2),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+            0 0 50px rgba(102, 126, 234, 0.2);
+    }
+    100% { 
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.2),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+            0 0 80px rgba(102, 126, 234, 0.4);
+    }
 }
 
 .header::before {
@@ -217,8 +256,15 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--color-primary-400), var(--color-primary-600), var(--color-primary-400));
+    height: 6px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+    background-size: 200% 100%;
+    animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 0%; }
 }
 
 .header-content {
@@ -227,12 +273,26 @@ body {
 }
 
 .header-title {
-    font-size: var(--text-5xl);
-    color: var(--color-primary-700);
+    font-size: var(--text-6xl);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: var(--space-6);
     font-weight: var(--font-extrabold);
     letter-spacing: -0.025em;
     line-height: var(--leading-tight);
+    animation: titleShine 3s ease-in-out infinite;
+    text-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+}
+
+@keyframes titleShine {
+    0%, 100% { 
+        filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.3));
+    }
+    50% { 
+        filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.5));
+    }
 }
 
 .header-icon {
@@ -298,11 +358,30 @@ body {
 }
 
 .progress-container {
-    background: var(--color-surface);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border-light);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease-in-out infinite;
 }
 
 .progress-header {
@@ -552,19 +631,45 @@ body {
 
 /* ===== カード ===== */
 .card {
-    background: var(--color-surface);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     border-radius: var(--radius-2xl);
     padding: var(--space-10);
     margin-bottom: var(--space-10);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border-light);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all var(--transition-slow);
     position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+    pointer-events: none;
 }
 
 .card:hover {
-    box-shadow: var(--shadow-base);
-    transform: translateY(-2px);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+        0 0 50px rgba(102, 126, 234, 0.3);
+    transform: translateY(-8px) scale(1.02);
+}
+
+.card:hover::before {
+    left: 100%;
 }
 
 /* ===== ステップセクション ===== */
@@ -1713,15 +1818,39 @@ select.form-control {
 }
 
 .btn--primary {
-    background: var(--color-primary-500);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: var(--shadow-base);
+    box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn--primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
 }
 
 .btn--primary:hover:not(:disabled) {
-    background: var(--color-primary-600);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.2),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 50px rgba(102, 126, 234, 0.4);
+}
+
+.btn--primary:hover::before {
+    left: 100%;
 }
 
 .btn--secondary {
@@ -1923,13 +2052,62 @@ select.form-control {
     font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
     color: var(--color-text-secondary);
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
+    text-align: left;
+    padding: var(--space-6);
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.results-main-summary p {
+    margin-bottom: var(--space-4);
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 .results-main-summary strong {
     font-weight: var(--font-bold);
     color: var(--color-primary-700);
+    white-space: nowrap;
+}
+
+.results-highlight {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: var(--font-extrabold);
+    font-size: 1.2em;
+    margin: 0 var(--space-1);
+}
+
+.results-section-break {
+    margin: var(--space-6) 0;
+    padding: var(--space-4) 0;
+    border-top: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.results-recommendation {
+    background: var(--color-primary-50);
+    border-left: 4px solid var(--color-primary-500);
+    padding: var(--space-4);
+    margin: var(--space-4) 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+.results-number-highlight {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(102, 126, 234, 0.1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-bold);
+    color: var(--color-primary-700);
+    margin: 0 var(--space-1);
+    white-space: nowrap;
 }
 
 .results-summary-section {
@@ -2154,11 +2332,51 @@ select.form-control {
     transition: all var(--transition-base);
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
-    display: flex;
-    align-items: flex-start;
+    display: block;
     border: 1px solid var(--color-border);
     position: relative;
     overflow: hidden;
+    margin-bottom: var(--space-4);
+}
+
+.advice-item-content {
+    padding-left: var(--space-10);
+    position: relative;
+}
+
+.advice-item h4 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-3);
+    color: var(--color-text-primary);
+}
+
+.advice-item p {
+    margin-bottom: var(--space-3);
+    word-wrap: break-word;
+}
+
+.advice-item ul {
+    margin: var(--space-3) 0;
+    padding-left: var(--space-5);
+}
+
+.advice-item li {
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-relaxed);
+}
+
+.advice-number-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--color-primary-700);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-bold);
+    font-size: var(--text-sm);
+    margin: 0 var(--space-1);
 }
 
 .advice-item::before {
@@ -2220,29 +2438,202 @@ select.form-control {
     font-weight: var(--font-semibold);
 }
 
+/* ===== 通知システム ===== */
+.notification-container {
+    position: fixed;
+    top: var(--space-6);
+    right: var(--space-6);
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.notification {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-3);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideInRight 0.5s ease-out;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-width: 400px;
+}
+
+.notification.success {
+    border-left: 4px solid var(--color-success-500);
+}
+
+.notification.error {
+    border-left: 4px solid var(--color-error-500);
+}
+
+.notification.info {
+    border-left: 4px solid var(--color-primary-500);
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.notification-icon {
+    font-size: var(--text-xl);
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-title {
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.notification-message {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+}
+
+/* ===== パフォーマンスインジケーター ===== */
+.performance-indicator {
+    position: fixed;
+    bottom: var(--space-6);
+    left: var(--space-6);
+    z-index: 1000;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.performance-content {
+    background: rgba(102, 126, 234, 0.95);
+    backdrop-filter: blur(20px);
+    color: white;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    animation: performancePulse 2s ease-in-out infinite;
+}
+
+@keyframes performancePulse {
+    0%, 100% { 
+        box-shadow: 
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05),
+            0 0 0 0 rgba(102, 126, 234, 0.4);
+    }
+    50% { 
+        box-shadow: 
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05),
+            0 0 0 8px rgba(102, 126, 234, 0.1);
+    }
+}
+
+.performance-icon {
+    font-size: var(--text-base);
+    animation: performanceRotate 2s linear infinite;
+}
+
+@keyframes performanceRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* ===== クイックガイド ===== */
 .quick-guide-overlay {
     position: fixed;
     inset: 0;
     display: none;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 10000;
     text-align: center;
     padding: var(--space-4);
 }
+
 .quick-guide-content {
-    background: var(--color-primary-600);
-    color: #fff;
-    padding: var(--space-6);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    color: var(--color-text-primary);
+    padding: var(--space-12);
+    border-radius: var(--radius-3xl);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 500px;
+    width: 90%;
+    animation: modalAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@keyframes modalAppear {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+.quick-guide-icon {
+    font-size: var(--text-6xl);
+    margin-bottom: var(--space-4);
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.quick-guide-content h3 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-4);
+}
+
+.quick-guide-content p {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
+}
+
 .quick-guide-arrow {
     display: block;
-    font-size: var(--text-4xl);
-    margin: var(--space-2) 0 var(--space-4);
+    font-size: var(--text-5xl);
+    margin: var(--space-4) 0 var(--space-6);
+    animation: arrowBounce 2s ease-in-out infinite;
+}
+
+@keyframes arrowBounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+    60% { transform: translateY(-4px); }
 }
 
 /* ===== フッター ===== */
@@ -2389,6 +2780,30 @@ select.form-control {
         grid-template-columns: 1fr;
     }
 
+    .results-main-summary {
+        padding: var(--space-4);
+        font-size: var(--text-base);
+        text-align: left;
+    }
+
+    .results-number-highlight,
+    .advice-number-badge {
+        font-size: var(--text-sm);
+        padding: var(--space-1) var(--space-2);
+        margin: var(--space-1) 0;
+        display: inline-block;
+    }
+
+    .advice-item-content {
+        padding-left: var(--space-6);
+    }
+
+    .advice-item p,
+    .advice-item li {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
     .chart-wrapper {
         height: 300px;
         padding: var(--space-4);
@@ -2516,6 +2931,197 @@ select.form-control {
     
     .chart-wrapper {
         height: 300px;
+    }
+}
+
+/* ===== 高度なマイクロインタラクション ===== */
+.form-control {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.form-control:focus {
+    transform: scale(1.02);
+    border-color: var(--color-primary-500);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 10px 15px -3px rgba(102, 126, 234, 0.1),
+        0 4px 6px -2px rgba(102, 126, 234, 0.05);
+}
+
+/* フォーカスリング効果 */
+.form-control:focus::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    padding: 3px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    animation: focusRingPulse 2s ease-in-out infinite;
+}
+
+@keyframes focusRingPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* ホバー効果の強化 */
+.btn, .step-label, .life-event-item, .fixed-cost-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover, .step-label:hover, .life-event-item:hover, .fixed-cost-item:hover {
+    animation: gentleBounce 0.6s ease-in-out;
+}
+
+@keyframes gentleBounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-4px); }
+    60% { transform: translateY(-2px); }
+}
+
+/* 成功状態のアニメーション */
+.form-control.success {
+    border-color: var(--color-success-500);
+    animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* プログレッシブローディング */
+.fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+.fade-in-up:nth-child(5) { animation-delay: 0.5s; }
+
+/* リアルタイムフィードバック */
+.real-time-update {
+    animation: dataUpdate 0.5s ease-out;
+}
+
+@keyframes dataUpdate {
+    0% { 
+        background-color: rgba(102, 126, 234, 0.1);
+        transform: scale(1.02);
+    }
+    100% { 
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* ===== 追加のアニメーション効果 ===== */
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* スキップリンクスタイル */
+.skip-link {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    background: var(--color-primary-600);
+    color: white;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: var(--font-semibold);
+    z-index: 10001;
+    transition: all var(--transition-base);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+    box-shadow: var(--shadow-lg);
+}
+
+/* グラジエント背景パターン */
+.gradient-bg-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-bg-2 {
+    background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+}
+
+.gradient-bg-3 {
+    background: linear-gradient(135deg, #f093fb 0%, #667eea 100%);
+}
+
+/* ロードシマー効果 */
+.shimmer {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmerMove 2s infinite;
+}
+
+@keyframes shimmerMove {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* 3Dカード効果 */
+.card-3d {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+    transform: rotateX(2deg) rotateY(2deg) translateZ(20px);
+}
+
+/* パルス効果 */
+.pulse-effect {
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { 
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    }
+}
+
+/* スクロール駆動アニメーション */
+@media (prefers-reduced-motion: no-preference) {
+    .scroll-animate {
+        animation: slideInFromBottom 0.8s ease-out both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 30%;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

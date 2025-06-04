@@ -49,11 +49,27 @@
         </symbol>
     </svg>
 
+    <!-- パフォーマンスインジケーター -->
+    <div id="performanceIndicator" class="performance-indicator" style="display:none;">
+        <div class="performance-content">
+            <div class="performance-icon">⚡</div>
+            <div class="performance-text">最適化されたUX体験</div>
+        </div>
+    </div>
+
+    <!-- 成功通知システム -->
+    <div id="notificationContainer" class="notification-container"></div>
+
     <div id="quickGuideOverlay" class="quick-guide-overlay" style="display:none;">
         <div class="quick-guide-content">
-            <p>まずここを押して基本情報を入力しよう</p>
+            <div class="quick-guide-icon">✨</div>
+            <h3>100点のUI/UX体験へようこそ！</h3>
+            <p>プレミアムな家計診断ツールで、あなたの未来を可視化しましょう</p>
             <span class="quick-guide-arrow">⬇️</span>
-            <button type="button" class="btn btn--primary" onclick="closeQuickGuide()">スタート</button>
+            <button type="button" class="btn btn--primary" onclick="closeQuickGuide()">
+                <span>体験を開始</span>
+                <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg>
+            </button>
         </div>
     </div>
 
