@@ -2900,7 +2900,7 @@ const AppInitializer = {
             }
 
             const exportData = this.generateExportData();
-            this.downloadExportData(exportData);
+            this.downloadExportPDF(exportData);
             
         } catch (error) {
             Utils.handleError(error, 'Results export');
@@ -3026,6 +3026,16 @@ const AppInitializer = {
         URL.revokeObjectURL(url);
         
         NotificationManager.show('結果をJSONファイルとしてエクスポートしました', 'success');
+    },
+
+    downloadExportPDF(data) {
+        const doc = new jspdf.jsPDF();
+        const text = JSON.stringify(data, null, 2);
+        const lines = doc.splitTextToSize(text, 180);
+        doc.text(lines, 10, 10);
+        doc.save(`生涯収支シミュレーション結果_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+        NotificationManager.show('結果をPDFファイルとしてエクスポートしました', 'success');
     }
 };
 
