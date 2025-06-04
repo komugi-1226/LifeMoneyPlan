@@ -3370,10 +3370,30 @@ if (typeof window !== 'undefined') {
 
 // ===== アプリケーション開始 =====
 document.addEventListener('DOMContentLoaded', function() {
-    AppInitializer.init().catch(error => {
-        console.error('Failed to initialize application:', error);
-        NotificationManager.show('アプリケーションの初期化に失敗しました', 'error');
-    });
+    // Chart.jsの読み込みを確認
+    const maxAttempts = 20; // 2秒間等待
+    let attempts = 0;
+
+    const checkChartJS = () => {
+        attempts++;
+        if (typeof Chart !== 'undefined') {
+            AppInitializer.init().catch(error => {
+                console.error('Failed to initialize application:', error);
+                NotificationManager.show('アプリケーションの初期化に失敗しました', 'error');
+            });
+        } else if (attempts < maxAttempts) {
+            setTimeout(checkChartJS, 100);
+        } else {
+            console.error('Chart.js failed to load');
+            NotificationManager.show('グラフライブラリの読み込みに失敗しました。ページを再読み込みしてください。', 'error');
+            // グラフなしでも基本機能を動作させるために初期化
+            AppInitializer.init().catch(error => {
+                console.error('Failed to initialize application:', error);
+            });
+        }
+    };
+
+    checkChartJS();
 });
 
 // エクスポート（モジュール使用時）
