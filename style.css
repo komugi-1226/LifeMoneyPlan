@@ -143,7 +143,7 @@
 --transition-fast: 0.15s ease;
 --transition-base: 0.3s ease;
 --transition-slow: 0.5s ease;
---transition-slower: 0.8s ease;
+--transition-slower: 0.8s ease; /* セミコロンを追加 */
     
     /* ブレークポイント */
     --breakpoint-sm: 640px;
