@@ -722,11 +722,39 @@ async function generateShareCard() {
 
     // QRコード
     const qrSize = 150;
-    const qrImg = new Image();
-    qrImg.crossOrigin = 'anonymous';
-    qrImg.src = `https://chart.googleapis.com/chart?cht=qr&chs=${qrSize}x${qrSize}&chl=${encodeURIComponent(window.location.href)}`;
-    await new Promise(r => { qrImg.onload = r; qrImg.onerror = r; });
-    ctx.drawImage(qrImg, 1140 - qrSize, 560 - qrSize, qrSize, qrSize);
+    let qrCanvas = null;
+    try {
+        if (typeof qrcode === "function") {
+            const qr = qrcode(0, "L");
+            qr.addData(window.location.href);
+            qr.make();
+            const count = qr.getModuleCount();
+            const cell = Math.floor(qrSize / count);
+            qrCanvas = document.createElement("canvas");
+            qrCanvas.width = qrCanvas.height = qrSize;
+            const qctx = qrCanvas.getContext("2d");
+            qctx.fillStyle = "#ffffff";
+            qctx.fillRect(0, 0, qrSize, qrSize);
+            qctx.fillStyle = "#000000";
+            for (let r = 0; r < count; r++) {
+                for (let c = 0; c < count; c++) {
+                    if (qr.isDark(r, c)) {
+                        qctx.fillRect(c * cell, r * cell, cell, cell);
+                    }
+                }
+            }
+        } else {
+            console.warn("QR code library not loaded");
+        }
+    } catch (e) {
+        console.warn("QR code generation failed", e);
+    }
+    if (qrCanvas) {
+        ctx.drawImage(qrCanvas, 1140 - qrSize, 560 - qrSize, qrSize, qrSize);
+    } else {
+        ctx.fillStyle = "#eeeeee";
+        ctx.fillRect(1140 - qrSize, 560 - qrSize, qrSize, qrSize);
+    }
 
     return canvas;
 }
@@ -736,7 +764,10 @@ async function shareResults() {
     try {
         const shareCanvas = await generateShareCard();
         const blob = await new Promise(res => shareCanvas.toBlob(res));
-        if (!blob) throw new Error('Blob生成に失敗しました');
+        if (!blob) {
+            NotificationManager.show("画像の生成に失敗しました", "error");
+            return;
+        }
         const file = new File([blob], 'share.png', { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
