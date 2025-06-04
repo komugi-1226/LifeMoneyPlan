@@ -2591,9 +2591,27 @@ const ResultsManager = {
 
 // ===== アプリケーション初期化 =====
 const AppInitializer = {
+    checkBrowserSupport() {
+        const features = {
+            localStorage: typeof(Storage) !== "undefined",
+            canvas: !!document.createElement("canvas").getContext,
+            es6: typeof Symbol !== "undefined"
+        };
+        const unsupported = Object.entries(features)
+            .filter(([key, supported]) => !supported)
+            .map(([key]) => key);
+        if (unsupported.length > 0) {
+            console.warn("Unsupported features:", unsupported);
+            NotificationManager.show(`お使いのブラウザは一部機能に対応していません。最新版への更新をお勧めします。`, "warning");
+        }
+        return unsupported.length === 0;
+    },
     async init() {
         try {
             console.log('アプリケーション初期化開始');
+            if (!this.checkBrowserSupport()) {
+                console.warn("Unsupported browser features detected");
+            }
             
             // データ読み込み
             await this.loadData();
