@@ -737,6 +737,7 @@ body {
     border-color: var(--color-error-500);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
     background: var(--color-error-50);
+    animation: shake 0.3s ease-in-out;
 }
 
 .form-control:disabled {
@@ -1881,6 +1882,13 @@ select.form-control {
     50% { transform: scale(1.05); }
 }
 
+/* エラー状態のアニメーション */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
 .rating-s {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     color: #92400e;
@@ -2486,7 +2494,7 @@ select.form-control {
 .form-control:focus-visible,
 .step-label:focus-visible,
 .tooltip-trigger:focus-visible {
-    outline: 2px solid var(--color-primary-500);
+    outline: 3px solid var(--color-primary-500) !important;
     outline-offset: 2px;
 }
 
@@ -2542,10 +2550,12 @@ select.form-control {
     }
     
     .btn {
-        border-width: 3px;
+        border-width: 3px !important;
+        font-weight: bold;
     }
     
     .form-control {
-        border-width: 3px;
+        border-width: 3px !important;
+        font-weight: bold;
     }
 }
