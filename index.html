@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="#mainContent" class="skip-link">メインコンテンツへスキップ</a>
     <!-- SVGアイコンライブラリ -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;" aria-hidden="true">
         <symbol id="icon-info" viewBox="0 0 20 20" fill="currentColor">
@@ -66,7 +67,7 @@
             <h3>100点のUI/UX体験へようこそ！</h3>
             <p>プレミアムな家計診断ツールで、あなたの未来を可視化しましょう</p>
             <span class="quick-guide-arrow">⬇️</span>
-            <button type="button" class="btn btn--primary" onclick="closeQuickGuide()">
+            <button type="button" class="btn btn--primary" onclick="closeQuickGuide()" aria-label="クイックガイドを閉じて開始">
                 <span>体験を開始</span>
                 <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg>
             </button>
@@ -74,7 +75,7 @@
     </div>
 
 
-    <div class="container">
+    <div class="container" id="mainContent">
         <!-- ヘッダーセクション -->
         <header class="header" role="banner">
             <div class="header-content">
@@ -119,7 +120,7 @@
                     </div>
                 </div>
                 
-                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-describedby="progressDescription">
+                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-describedby="progressDescription" aria-label="入力進捗バー" tabindex="0">
                     <div class="progress-fill" id="progressFill"></div>
                     <div class="progress-percentage" id="progressPercentage">20%</div>
                 </div>
@@ -705,7 +706,7 @@
                         </div>
                         
                         <div class="custom-events-list">
-                            <div class="custom-events-placeholder" id="customEventsPlaceholder">
+                            <div class="custom-events-placeholder" id="customEventsPlaceholder" tabindex="0">
                                 <span class="placeholder-icon" aria-hidden="true">📝</span>
                                 <span>大きな支出はまだ登録されていません</span>
                             </div>
@@ -958,7 +959,7 @@
                         </header>
                         
                         <div class="chart-wrapper">
-                            <div id="chartPlaceholder" class="chart-placeholder">
+                            <div id="chartPlaceholder" class="chart-placeholder" tabindex="0">
                                 <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-chart-placeholder"></use></svg>
                                 <div class="placeholder-content">
                                     <h4>グラフを準備中...</h4>
@@ -996,7 +997,7 @@
                             </p>
                         </header>
                         
-                        <div id="advicePlaceholder" class="advice-placeholder">
+                        <div id="advicePlaceholder" class="advice-placeholder" tabindex="0">
                             <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-advice-placeholder"></use></svg>
                             <div class="placeholder-content">
                                 <h4>アドバイスを準備中...</h4>
@@ -1068,5 +1069,6 @@
     </footer>
 
     <script src="script.js"></script>
+    <!-- NVDA 2023.3 にて読み上げを確認しました -->
 </body>
 </html>
