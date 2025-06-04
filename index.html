@@ -42,6 +42,15 @@
         </symbol>
     </svg>
 
+    <div id="quickGuideOverlay" class="quick-guide-overlay" style="display:none;">
+        <div class="quick-guide-content">
+            <p>まずここを押して基本情報を入力しよう</p>
+            <span class="quick-guide-arrow">⬇️</span>
+            <button type="button" class="btn btn--primary" onclick="closeQuickGuide()">スタート</button>
+        </div>
+    </div>
+
+
     <div class="container">
         <!-- ヘッダーセクション -->
         <header class="header" role="banner">
@@ -988,6 +997,9 @@
                     </button>
                     <button class="btn btn--success" onclick="scrollToAdvice()">
                         <span>アドバイスを見る</span>
+                    </button>
+                    <button class="btn btn--primary" onclick="exportResults()">
+                        <span>結果をダウンロード</span>
                     </button>
                 </div>
                 <div class="step-info completed">

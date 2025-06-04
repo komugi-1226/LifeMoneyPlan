@@ -2212,6 +2212,31 @@ select.form-control {
     font-weight: var(--font-semibold);
 }
 
+/* ===== クイックガイド ===== */
+.quick-guide-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    text-align: center;
+    padding: var(--space-4);
+}
+.quick-guide-content {
+    background: var(--color-primary-600);
+    color: #fff;
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+.quick-guide-arrow {
+    display: block;
+    font-size: var(--text-4xl);
+    margin: var(--space-2) 0 var(--space-4);
+}
+
 /* ===== フッター ===== */
 .footer {
     margin-top: var(--space-20);
@@ -2450,6 +2475,9 @@ select.form-control {
     .range-min,
     .range-max {
         min-width: auto;
+    }
+    .quick-guide-content {
+        width: 90%;
     }
 }
 
