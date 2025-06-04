@@ -70,6 +70,13 @@
             </div>
         </header>
 
+        <!-- 大きなステップ表示 -->
+        <nav class="main-step-tracker" aria-label="ステップ概要">
+            <div class="main-step active" data-phase="1" aria-current="step">はじめに</div>
+            <div class="main-step" data-phase="2">入力</div>
+            <div class="main-step" data-phase="3">結果</div>
+        </nav>
+
         <!-- プログレスセクション -->
         <section class="progress-section" aria-label="進捗状況">
             <div class="progress-container">
@@ -973,16 +980,14 @@
             
             <nav class="step-navigation" aria-label="アクションメニュー">
                 <div class="step-buttons">
-                    <button class="btn btn--secondary" onclick="prevStep()">
-                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg>
-                        <span>設定を修正</span>
-                    </button>
                     <button class="btn btn--outline" onclick="resetApp()">
-                        <span>最初からやり直す</span>
+                        <span>もう一度やり直す</span>
                     </button>
-                    <button class="btn btn--success" onclick="exportResults()">
-                        <span>結果をエクスポート</span>
-                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
+                    <button class="btn btn--secondary" onclick="saveSettings()">
+                        <span>設定を保存する</span>
+                    </button>
+                    <button class="btn btn--success" onclick="scrollToAdvice()">
+                        <span>アドバイスを見る</span>
                     </button>
                 </div>
                 <div class="step-info completed">
