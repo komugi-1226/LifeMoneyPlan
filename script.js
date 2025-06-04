@@ -142,6 +142,22 @@ const Utils = {
         return Math.max(min, Math.min(max, num));
     },
 
+    // 金額計算用の精密計算関数
+    preciseAdd(a, b) {
+        const factor = 10000; // 万円を円に変換
+        return Math.round(a * factor + b * factor) / factor;
+    },
+
+    preciseMultiply(a, b) {
+        const factor = 10000;
+        return Math.round(a * factor * b) / factor;
+    },
+
+    precisePercentage(value, total) {
+        if (total === 0) return 0;
+        return Math.round((value / total) * 10000) / 100;
+    },
+
     // 年齢計算
     calculateAge(birthDate) {
         if (!birthDate) return null;
@@ -1388,7 +1404,7 @@ const FixedCostManager = {
 
     updateSummary() {
         const total = Object.values(appState.fixedCosts)
-            .reduce((sum, cost) => cost.isActive ? sum + cost.amount : sum, 0);
+            .reduce((sum, cost) => cost.isActive ? Utils.preciseAdd(sum, cost.amount) : sum, 0);
 
         const totalElement = Utils.getElement('totalFixedCosts', false);
         if (totalElement) {
@@ -1396,7 +1412,7 @@ const FixedCostManager = {
         }
 
         const income = appState.basicInfo.income || 0;
-        const ratio = income > 0 ? (total / income * 100) : 0;
+        const ratio = income > 0 ? Utils.precisePercentage(total, income) : 0;
 
         const ratioElement = Utils.getElement('fixedCostsRatio', false);
         if (ratioElement) {
@@ -2033,17 +2049,17 @@ const CalculationEngine = {
         for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
             const yearData = this.calculateYearData(age, currentAge, retirementAge, invRate, nisaBalance, cashBalance);
             
-            totalIncome += yearData.income;
-            totalExpenses += yearData.cashExpense;
+            totalIncome = Utils.preciseAdd(totalIncome, yearData.income);
+            totalExpenses = Utils.preciseAdd(totalExpenses, yearData.cashExpense);
             nisaBalance = yearData.nisaBalance;
             cashBalance = yearData.cumulativeCash;
             
             yearlyData.push(yearData);
         }
 
-        const finalBalance = cashBalance + nisaBalance;
+        const finalBalance = Utils.preciseAdd(cashBalance, nisaBalance);
         const retirementData = yearlyData.find(d => d.age === retirementAge) || yearlyData[yearlyData.length - 1];
-        
+
         return {
             totalIncome,
             totalExpenses,
@@ -2051,7 +2067,7 @@ const CalculationEngine = {
             retirementAssets: retirementData?.totalAssets || 0,
             retirementCash: retirementData?.cumulativeCash || 0,
             retirementNisa: retirementData?.nisaBalance || 0,
-            nisaFinalContribution: yearlyData.reduce((sum, d) => sum + d.nisaInvestment, 0),
+            nisaFinalContribution: yearlyData.reduce((sum, d) => Utils.preciseAdd(sum, d.nisaInvestment), 0),
             nisaFinalBalance: nisaBalance,
             yearlyData,
             rating: this.calculateRating(finalBalance, totalIncome, expectedLifeExpectancy - currentAge)
