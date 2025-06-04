@@ -532,6 +532,16 @@ const UIManager = {
         }
 
         this.updateStepLabels();
+        this.updateMainSteps();
+    },
+
+    // メインステップ更新
+    updateMainSteps() {
+        const phaseMap = { 1: 1, 2: 2, 3: 2, 4: 2, 5: 3 };
+        const currentPhase = phaseMap[appState.currentStep] || 1;
+        document.querySelectorAll('.main-step').forEach((step, index) => {
+            step.classList.toggle('active', index === currentPhase - 1);
+        });
     },
 
     // ステップラベル更新
@@ -2646,6 +2656,17 @@ const AppInitializer = {
         window.calculateResults = () => CalculationEngine.calculate();
         window.resetApp = () => this.resetApplication();
         window.exportResults = () => this.exportResults();
+        window.saveSettings = () => {
+            if (StorageManager.save(appState)) {
+                NotificationManager.show('設定を保存しました', 'success');
+            }
+        };
+        window.scrollToAdvice = () => {
+            const adviceSection = document.querySelector('.advice-section');
+            if (adviceSection) {
+                Utils.scrollToElement(adviceSection, 100);
+            }
+        };
     },
 
     setupAdvancedSettingsListeners() {

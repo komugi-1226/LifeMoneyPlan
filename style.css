@@ -270,6 +270,28 @@ body {
     font-size: var(--text-base);
 }
 
+/* ===== 大きなステップ表示 ===== */
+.main-step-tracker {
+    display: flex;
+    justify-content: space-around;
+    margin: var(--space-10) 0;
+}
+
+.main-step {
+    flex: 1;
+    text-align: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    padding-bottom: var(--space-2);
+    border-bottom: 4px solid var(--color-secondary-300);
+    color: var(--color-text-tertiary);
+}
+
+.main-step.active {
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-700);
+}
+
 /* ===== プログレスセクション ===== */
 .progress-section {
     margin-bottom: var(--space-16);
@@ -2400,6 +2422,22 @@ select.form-control {
     }
 
     .card {
+        padding: var(--space-4);
+    }
+
+    .main-step-tracker {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .main-step {
+        font-size: var(--text-lg);
+        border-bottom-width: 2px;
+    }
+
+    .form-control,
+    .btn {
+        font-size: var(--text-lg);
         padding: var(--space-4);
     }
 
