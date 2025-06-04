@@ -517,15 +517,16 @@ const UIManager = {
         progressFill.setAttribute('aria-valuenow', percentage);
         
         if (progressPercentage) {
+        const remaining = 100 - percentage;
             progressPercentage.textContent = `${percentage}%`;
         }
         
         if (progressSummary) {
             const messages = {
-                1: 'ステップ 1 / 5 を入力中 - 基本情報',
-                2: 'ステップ 2 / 5 を入力中 - 固定費',
-                3: 'ステップ 3 / 5 を入力中 - ライフイベント',
-                4: 'ステップ 4 / 5 を入力中 - 詳細設定',
+                1: 'ステップ 1 / 5 (残り ' + remaining + '%) - 基本情報',
+                2: 'ステップ 2 / 5 (残り ' + remaining + '%) - 固定費',
+                3: 'ステップ 3 / 5 (残り ' + remaining + '%) - ライフイベント',
+                4: 'ステップ 4 / 5 (残り ' + remaining + '%) - 詳細設定',
                 5: 'シミュレーション完了！'
             };
             progressSummary.textContent = messages[appState.currentStep] || '';
@@ -704,7 +705,23 @@ const UIManager = {
             if (advicePlaceholder) advicePlaceholder.style.display = 'flex';
             if (adviceContent) adviceContent.style.display = 'none';
         }
-    }
+    },
+    // クイックガイド表示
+    showQuickGuide() {
+        const overlay = Utils.getElement("quickGuideOverlay", false);
+        if (overlay && !localStorage.getItem("guideShown")) {
+            overlay.style.display = "flex";
+        }
+    },
+
+    // クイックガイド非表示
+    closeQuickGuide() {
+        const overlay = Utils.getElement("quickGuideOverlay", false);
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+        localStorage.setItem("guideShown", "1");
+    },
 };
 
 // ===== フォーム管理システム =====
@@ -2667,6 +2684,7 @@ const AppInitializer = {
                 Utils.scrollToElement(adviceSection, 100);
             }
         };
+        window.closeQuickGuide = () => UIManager.closeQuickGuide();
     },
 
     setupAdvancedSettingsListeners() {
@@ -2776,6 +2794,7 @@ const AppInitializer = {
         // 固定費サマリー更新
         FixedCostManager.updateSummary();
         
+        UIManager.showQuickGuide();
         // ライフイベント詳細設定の可視性更新
         LifeEventManager.updateDetailSettingsVisibility();
     },
