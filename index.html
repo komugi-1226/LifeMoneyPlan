@@ -156,6 +156,8 @@
             </div>
         </section>
 
+        <div id="loadingSpinner" class="spinner hidden" aria-hidden="true"></div>
+
         <!-- ローディングアニメーション -->
         <div class="loading" id="loadingAnimation" aria-live="polite" aria-hidden="true">
             <div class="loading-content">
@@ -306,7 +308,11 @@
                                         <label class="form-label" for="nationalPension実績Years">
                                             <span class="label-text">これまでの加入実績</span>
                                             <span class="label-annotation">（20歳〜現在）</span>
+                                            <span class="help-icon" id="help-nationalPension">?</span>
                                         </label>
+                                        <div class="tooltip" id="tooltip-nationalPension" role="tooltip" aria-hidden="true">
+                                            平均的に20年ほど加入します。満額受給するには 40 年加入が必要です。
+                                        </div>
                                         
                                         <div class="pension-slider-container">
                                             <input type="range" class="pension-slider" id="nationalPension実績Slider" 
