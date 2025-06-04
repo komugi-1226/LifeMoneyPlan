@@ -516,11 +516,11 @@ const UIManager = {
         progressFill.style.width = `${percentage}%`;
         progressFill.setAttribute('aria-valuenow', percentage);
         
-        if (progressPercentage) {
         const remaining = 100 - percentage;
+        if (progressPercentage) {
             progressPercentage.textContent = `${percentage}%`;
         }
-        
+
         if (progressSummary) {
             const messages = {
                 1: 'ステップ 1 / 5 (残り ' + remaining + '%) - 基本情報',
