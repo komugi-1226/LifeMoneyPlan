@@ -417,12 +417,23 @@ const StorageManager = {
                 timestamp: Date.now(),
                 data: data
             });
-            
+
+            // 容量制限チェック（概算5MB）
+            if (serialized.length > 5000000) {
+                throw new Error('Data too large for localStorage');
+            }
+
             localStorage.setItem(APP_CONFIG.STORAGE_KEY, serialized);
             return true;
         } catch (error) {
             console.error('Storage save error:', error);
-            NotificationManager.show('データの保存に失敗しました', 'error');
+            if (error.name === 'QuotaExceededError') {
+                NotificationManager.show('ストレージ容量が不足しています。データをエクスポートしてブラウザのキャッシュをクリアしてください', 'error');
+            } else if (error.message.includes('Data too large')) {
+                NotificationManager.show('データサイズが大きすぎます', 'error');
+            } else {
+                NotificationManager.show('データの保存に失敗しました', 'error');
+            }
             return false;
         }
     },
