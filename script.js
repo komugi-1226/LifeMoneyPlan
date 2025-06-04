@@ -3095,6 +3095,11 @@ const AppInitializer = {
     }
 };
 
+// Expose ResultsManager in the global scope for inline event handlers
+if (typeof window !== 'undefined') {
+    window.ResultsManager = ResultsManager;
+}
+
 // ===== デバッグ用ユーティリティ =====
 if (typeof window !== 'undefined') {
     // デバッグ用のグローバル関数
