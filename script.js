@@ -1278,6 +1278,7 @@ const StorageManager = {
 
 // ===== UI管理システム =====
 const UIManager = {
+    isAnimating: false,
     // 進捗更新
     updateProgress() {
         const progressFill = Utils.getElement('progressFill');
@@ -1343,27 +1344,39 @@ const UIManager = {
 
     // ステップ表示切り替え
     showStep(stepNumber) {
-        // 現在のステップを非表示
-        document.querySelectorAll('.step-section').forEach(section => {
-            section.classList.remove('active');
+        if (this.isAnimating || appState.currentStep === stepNumber) return;
+        this.isAnimating = true;
+
+        const currentSection = Utils.getElement(`step${appState.currentStep}`);
+        const nextSection = Utils.getElement(`step${stepNumber}`);
+        if (!nextSection) { this.isAnimating = false; return; }
+
+        if (currentSection) {
+            currentSection.classList.add('step-exit');
+        }
+        nextSection.classList.add('active', 'step-enter');
+
+        requestAnimationFrame(() => {
+            if (currentSection) currentSection.classList.add('step-exit-active');
+            nextSection.classList.add('step-enter-active');
         });
 
-        // 指定されたステップを表示
-        const targetStep = Utils.getElement(`step${stepNumber}`);
-        if (targetStep) {
-            targetStep.classList.add('active');
-            
-            // スムーズスクロール
-            Utils.scrollToElement(targetStep, 100);
-            
-            // フォーカス管理
-            const firstInput = targetStep.querySelector('input, select, button');
-            if (firstInput) {
-                setTimeout(() => {
-                    firstInput.focus();
-                }, APP_CONFIG.ANIMATION_DURATION);
+        setTimeout(() => {
+            if (currentSection) {
+                currentSection.classList.remove('active', 'step-exit', 'step-exit-active');
             }
-        }
+            nextSection.classList.remove('step-enter', 'step-enter-active');
+            this.isAnimating = false;
+
+            // フォーカス管理
+            const firstInput = nextSection.querySelector('input, select, button');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }, APP_CONFIG.ANIMATION_DURATION);
+
+        // スムーズスクロール
+        Utils.scrollToElement(nextSection, 100);
 
         appState.currentStep = stepNumber;
         this.updateProgress();
@@ -1411,23 +1424,20 @@ const UIManager = {
 
     // ローディング表示
     showLoading() {
-        const loading = Utils.getElement('loadingAnimation');
-        if (!loading) return;
-
-        loading.classList.add('active');
-        loading.setAttribute('aria-hidden', 'false');
-        
-        // ローディングステップアニメーション
-        this.animateLoadingSteps();
+        const spinner = Utils.getElement('loadingSpinner');
+        if (spinner) {
+            spinner.classList.remove('hidden');
+            spinner.setAttribute('aria-hidden', 'false');
+        }
     },
 
     // ローディング非表示
     hideLoading() {
-        const loading = Utils.getElement('loadingAnimation');
-        if (!loading) return;
-
-        loading.classList.remove('active');
-        loading.setAttribute('aria-hidden', 'true');
+        const spinner = Utils.getElement('loadingSpinner');
+        if (spinner) {
+            spinner.classList.add('hidden');
+            spinner.setAttribute('aria-hidden', 'true');
+        }
     },
 
     // ローディングステップアニメーション
@@ -3676,6 +3686,17 @@ const AppInitializer = {
         window.addEventListener('unhandledrejection', (e) => {
             console.error('Unhandled promise rejection:', e.reason);
             Utils.handleError(e.reason, 'Unhandled promise rejection');
+        });
+
+        // インラインヘルプ表示
+        document.querySelectorAll('.help-icon').forEach(icon => {
+            const tooltip = document.getElementById('tooltip-' + icon.id.replace('help-', ''));
+            const show = () => { if (tooltip) { tooltip.style.display = 'block'; tooltip.setAttribute('aria-hidden', 'false'); } };
+            const hide = () => { if (tooltip) { tooltip.style.display = 'none'; tooltip.setAttribute('aria-hidden', 'true'); } };
+            icon.addEventListener('mouseenter', show);
+            icon.addEventListener('mouseleave', hide);
+            icon.addEventListener('focus', show);
+            icon.addEventListener('blur', hide);
         });
     },
 
