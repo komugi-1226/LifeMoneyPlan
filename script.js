@@ -145,21 +145,31 @@ const Utils = {
     // 年齢計算
     calculateAge(birthDate) {
         if (!birthDate) return null;
-        
+
         try {
             const today = new Date();
             const birth = new Date(birthDate);
-            
-            if (isNaN(birth.getTime())) return null;
-            
+
+            // 無効な日付をチェック
+            if (isNaN(birth.getTime()) || birth > today) {
+                console.warn('Invalid birth date:', birthDate);
+                return null;
+            }
+
+            // 未来の日付をチェック
+            if (birth.getFullYear() > today.getFullYear()) {
+                return null;
+            }
+
             let age = today.getFullYear() - birth.getFullYear();
             const monthDiff = today.getMonth() - birth.getMonth();
-            
+
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
                 age--;
             }
-            
-            return Math.max(0, age);
+
+            // 年齢の妥当性チェック（0-150歳）
+            return Math.max(0, Math.min(age, 150));
         } catch (error) {
             console.error('Age calculation error:', error);
             return null;
