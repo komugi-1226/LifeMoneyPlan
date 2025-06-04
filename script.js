@@ -3073,13 +3073,205 @@ const AppInitializer = {
     },
 
     downloadExportPDF(data) {
-        const doc = new jspdf.jsPDF();
-        const text = JSON.stringify(data, null, 2);
-        const lines = doc.splitTextToSize(text, 180);
-        doc.text(lines, 10, 10);
-        doc.save(`生涯収支シミュレーション結果_${new Date().toISOString().slice(0, 10)}.pdf`);
+        try {
+            // ブラウザの印刷機能を使用したPDF生成
+            this.createPrintablePage(data);
+        } catch (error) {
+            console.error('PDF export error:', error);
+            NotificationManager.show('PDFの生成に失敗しました。代わりにJSONファイルをダウンロードします', 'warning');
+            this.downloadExportData(data);
+        }
+    },
 
-        NotificationManager.show('結果をPDFファイルとしてエクスポートしました', 'success');
+    // 新しいメソッドを追加
+    createPrintablePage(data) {
+        const printWindow = window.open('', '_blank');
+        const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
+
+        const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="ja">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>人生おかね診断結果</title>
+            <style>
+                body {
+                    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+                    line-height: 1.6;
+                    margin: 20px;
+                    color: #333;
+                }
+                .header {
+                    text-align: center;
+                    border-bottom: 2px solid #2563eb;
+                    padding-bottom: 20px;
+                    margin-bottom: 30px;
+                }
+                .title {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #2563eb;
+                    margin-bottom: 10px;
+                }
+                .section {
+                    margin-bottom: 25px;
+                    page-break-inside: avoid;
+                }
+                .section-title {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #1d4ed8;
+                    border-left: 4px solid #2563eb;
+                    padding-left: 10px;
+                    margin-bottom: 15px;
+                }
+                .info-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    margin-bottom: 15px;
+                }
+                .info-item {
+                    background: #f8fafc;
+                    padding: 10px;
+                    border-radius: 8px;
+                    border: 1px solid #e2e8f0;
+                }
+                .info-label {
+                    font-weight: bold;
+                    color: #475569;
+                    font-size: 14px;
+                }
+                .info-value {
+                    color: #1e293b;
+                    font-size: 16px;
+                }
+                .result-highlight {
+                    background: #eff6ff;
+                    border: 2px solid #3b82f6;
+                    border-radius: 12px;
+                    padding: 20px;
+                    text-align: center;
+                    margin: 20px 0;
+                }
+                .rating {
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #1d4ed8;
+                    margin-bottom: 10px;
+                }
+                .amount {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #059669;
+                }
+                .footer {
+                    margin-top: 40px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #6b7280;
+                    border-top: 1px solid #e5e7eb;
+                    padding-top: 20px;
+                }
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">💰 人生おかね診断結果</div>
+                <div>実行日時: ${new Date().toLocaleString('ja-JP')}</div>
+            </div>
+
+            <div class="result-highlight">
+                <div class="rating">評価: ${appState.results.rating}ランク</div>
+                <div class="amount">${appState.advancedSettings.expectedLifeExpectancy}歳時点予測総資産: ${Utils.formatCurrency(appState.results.finalBalance)}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📋 基本情報</div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">現在年齢</div>
+                        <div class="info-value">${currentAge !== null ? currentAge + '歳' : '--'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">月の手取り収入</div>
+                        <div class="info-value">${appState.basicInfo.income !== null ? appState.basicInfo.income + '万円' : '--'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">職業</div>
+                        <div class="info-value">${this.getOccupationText(appState.basicInfo.occupation)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">リタイア希望年齢</div>
+                        <div class="info-value">${appState.advancedSettings.retirementAge}歳</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">💰 予測結果</div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">生涯総収入</div>
+                        <div class="info-value">${Utils.formatCurrency(appState.results.totalIncome)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">生涯総支出</div>
+                        <div class="info-value">${Utils.formatCurrency(appState.results.totalExpenses)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">${appState.advancedSettings.retirementAge}歳時点総資産</div>
+                        <div class="info-value">${Utils.formatCurrency(appState.results.retirementAssets)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">NISA最終評価額</div>
+                        <div class="info-value">${Utils.formatCurrency(appState.results.nisaFinalBalance)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🎯 ライフイベント</div>
+                <div class="info-value">${this.getLifeEventsText()}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">💸 その他の大きな支出</div>
+                <div class="info-value">${this.getCustomEventsText()}</div>
+            </div>
+
+            <div class="footer">
+                <p>※ この結果は概算値であり、実際の収支と異なる場合があります</p>
+                <p>※ 定期的な見直しと専門家への相談をお勧めします</p>
+            </div>
+
+            <div class="no-print" style="text-align: center; margin-top: 30px;">
+                <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                    📄 PDFとして保存
+                </button>
+                <button onclick="window.close()" style="background: #6b7280; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-left: 10px;">
+                    閉じる
+                </button>
+            </div>
+        </body>
+        </html>`;
+
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+
+        // ページが読み込まれた後に印刷ダイアログを表示
+        printWindow.onload = function() {
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        };
+
+        NotificationManager.show('印刷画面を開きました。PDFとして保存してください', 'success');
     },
 
     downloadChartImage() {
