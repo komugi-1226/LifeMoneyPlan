@@ -1949,7 +1949,7 @@ const FixedCostManager = {
 
         APP_DATA.categories.forEach(category => {
             const savedCost = appState.fixedCosts[category.id] || {
-                amount: ['housing', 'food', 'utilities'].includes(category.id) ? 
+                amount: ['housing', 'food', 'utilities'].includes(category.id) ?
                     Utils.parseNumber(category.placeholder, 0) : 0,
                 isActive: false
             };
@@ -1959,6 +1959,21 @@ const FixedCostManager = {
         });
 
         this.updateSummary();
+    },
+
+    setupValidationRules() {
+        APP_DATA.categories.forEach(category => {
+            const fieldId = `cost-${category.id}`;
+            ValidationManager.rules.delete(fieldId);
+            ValidationManager.addRule(
+                fieldId,
+                (value) => {
+                    const num = parseFloat(value);
+                    return !isNaN(num) && num >= 0 && num <= category.max;
+                },
+                `${category.name}は0〜${category.max}万円で入力してください`
+            );
+        });
     },
 
     createCostItem(category, savedCost) {
@@ -2084,6 +2099,42 @@ const LifeEventManager = {
         });
 
         this.updateDetailSettingsVisibility();
+    },
+
+    setupValidationRules() {
+        // 子どもの人数
+        ValidationManager.rules.delete('childrenCount');
+        ValidationManager.addRule(
+            'childrenCount',
+            (value) => {
+                const num = parseInt(value);
+                return !isNaN(num) && num >= 0 && num <= 10;
+            },
+            '子供の人数を0〜10人で入力してください'
+        );
+
+        // 住宅購入年齢
+        ValidationManager.rules.delete('housingAge');
+        ValidationManager.addRule(
+            'housingAge',
+            (value) => {
+                const age = parseInt(value);
+                const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
+                return !isNaN(age) && age >= 20 && age <= 70 && (!currentAge || age >= currentAge);
+            },
+            '住宅購入年齢を20〜70歳で入力してください'
+        );
+
+        // NISA積立額
+        ValidationManager.rules.delete('nisaAmount');
+        ValidationManager.addRule(
+            'nisaAmount',
+            (value) => {
+                const num = parseFloat(value);
+                return !isNaN(num) && num >= 0.1 && num <= 30;
+            },
+            'NISA月額を0.1〜30万円で入力してください'
+        );
     },
 
     createEventItem(event) {
@@ -2472,43 +2523,41 @@ const StepValidator = {
     },
 
     validateFixedCosts(errors) {
-        let hasInvalidCost = false;
-        
         APP_DATA.categories.forEach(category => {
+            const fieldId = `cost-${category.id}`;
             const cost = appState.fixedCosts[category.id];
-            if (cost && cost.amount > category.max) {
-                errors.set(`cost-${category.id}`, `${category.name}は${category.max}万円以下で入力してください`);
-                hasInvalidCost = true;
+            const value = cost ? cost.amount : '';
+            const result = ValidationManager.validate(fieldId, value);
+            if (!result.isValid) {
+                errors.set(fieldId, result.message);
             }
         });
-
-        return !hasInvalidCost;
     },
 
     validateLifeEvents(errors) {
         // ライフイベント詳細設定の検証
         if (appState.lifeEvents.children) {
-            const childrenCount = appState.detailSettings.childrenCount;
-            if (childrenCount < 0 || childrenCount > 10) {
-                errors.set('childrenCount', '子供の人数を0〜10人で入力してください');
+            const result = ValidationManager.validate('childrenCount', appState.detailSettings.childrenCount);
+            if (!result.isValid) {
+                errors.set('childrenCount', result.message);
             }
         }
 
         if (appState.lifeEvents.housing) {
-            const housingAge = appState.detailSettings.housingAge;
-            const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
-            if (currentAge && housingAge < currentAge) {
-                errors.set('housingAge', '住宅購入年齢は現在年齢以上で設定してください');
+            const ageResult = ValidationManager.validate('housingAge', appState.detailSettings.housingAge);
+            if (!ageResult.isValid) {
+                errors.set('housingAge', ageResult.message);
             }
-            if (housingAge < 20 || housingAge > 70) {
-                errors.set('housingAge', '住宅購入年齢を20〜70歳で入力してください');
+            const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
+            if (currentAge && appState.detailSettings.housingAge < currentAge) {
+                errors.set('housingAge', '住宅購入年齢は現在年齢以上で設定してください');
             }
         }
 
         if (appState.lifeEvents.nisa) {
-            const nisaAmount = appState.detailSettings.nisaAmount;
-            if (nisaAmount < 0.1 || nisaAmount > 30) {
-                errors.set('nisaAmount', 'NISA月額を0.1〜30万円で入力してください');
+            const nisaResult = ValidationManager.validate('nisaAmount', appState.detailSettings.nisaAmount);
+            if (!nisaResult.isValid) {
+                errors.set('nisaAmount', nisaResult.message);
             }
         }
 
@@ -3306,9 +3355,11 @@ const AppInitializer = {
         
         // 固定費レンダリング
         FixedCostManager.render();
-        
+        FixedCostManager.setupValidationRules();
+
         // ライフイベントレンダリング
         LifeEventManager.render();
+        LifeEventManager.setupValidationRules();
         
         // カスタムライフイベント設定
         CustomEventManager.setup();
