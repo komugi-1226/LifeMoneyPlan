@@ -444,8 +444,8 @@ const StorageManager = {
                 data: data
             });
 
-            // 容量制限チェック（概算5MB）
-            if (serialized.length > 5000000) {
+            // 容量制限チェック（概算2MB）
+            if (serialized.length > 2000000) {
                 throw new Error('Data too large for localStorage');
             }
 
