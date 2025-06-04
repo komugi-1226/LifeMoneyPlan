@@ -330,6 +330,18 @@ body::before {
     font-size: var(--text-base);
 }
 
+/* ユーザー体験指標を表示する小さなラベル */
+.ux-metrics {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 2px 6px;
+    border-radius: var(--radius-lg);
+}
+
 /* ===== 大きなステップ表示 ===== */
 .main-step-tracker {
     display: flex;
