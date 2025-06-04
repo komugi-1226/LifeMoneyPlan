@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生涯収支シミュレーター - あなたの未来の家計を診断</title>
+    <meta name="description" content="簡単な質問に答えるだけで、生涯にわたる収支と資産推移をシミュレーション。老後資金計画に役立つアドバイスも提供します。">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- SVGアイコンライブラリ -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;" aria-hidden="true">
+        <symbol id="icon-info" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-chart-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+        </symbol>
+        <symbol id="icon-advice-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.73 18.23H2.27a.9.9 0 01-.79-1.38L11.21 3.3a.9.9 0 011.58 0l9.73 13.55a.9.9 0 01-.79 1.38zM12 9v4M12 17h.01"/>
+        </symbol>
+        <symbol id="icon-plus" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+        </symbol>
+        <symbol id="icon-edit" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+          <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-trash" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-check" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-warning" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </symbol>
+        <symbol id="icon-calculator" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 112 0v3a1 1 0 11-2 0v-3zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 1a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zm4-4a1 1 0 100 2h.01a1 1 0 100-2H13zM9 9a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zM7 8a1 1 0 000 2h.01a1 1 0 000-2H7z" clip-rule="evenodd" />
+        </symbol>
+    </svg>
+
+    <div class="container">
+        <!-- ヘッダーセクション -->
+        <header class="header" role="banner">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <span class="header-icon" aria-hidden="true">💰</span>
+                    生涯収支シミュレーター
+                </h1>
+                <p class="header-subtitle">
+                    簡単な質問に答えるだけで、あなたの未来の家計を詳しく診断します
+                </p>
+                <div class="header-benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon" aria-hidden="true">📊</span>
+                        <span>詳細な資産推移グラフ</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon" aria-hidden="true">💡</span>
+                        <span>個別アドバイス付き</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon" aria-hidden="true">🔒</span>
+                        <span>データは端末内で安全に処理</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- プログレスセクション -->
+        <section class="progress-section" aria-label="進捗状況">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h2 class="progress-title">入力の進捗</h2>
+                    <div class="progress-summary" id="progressSummary" aria-live="polite">
+                        ステップ 1 / 5 を入力中
+                    </div>
+                </div>
+                
+                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-describedby="progressDescription">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-percentage" id="progressPercentage">20%</div>
+                </div>
+                
+                <div class="progress-steps" id="progressSteps">
+                    <button class="step-label active" data-step="1" type="button" aria-current="step">
+                        <span class="step-number">1</span>
+                        <span class="step-text">基本情報</span>
+                    </button>
+                    <button class="step-label" data-step="2" type="button">
+                        <span class="step-number">2</span>
+                        <span class="step-text">固定費</span>
+                    </button>
+                    <button class="step-label" data-step="3" type="button">
+                        <span class="step-number">3</span>
+                        <span class="step-text">ライフイベント</span>
+                    </button>
+                    <button class="step-label" data-step="4" type="button">
+                        <span class="step-number">4</span>
+                        <span class="step-text">詳細設定</span>
+                    </button>
+                    <button class="step-label" data-step="5" type="button">
+                        <span class="step-number">5</span>
+                        <span class="step-text">結果</span>
+                    </button>
+                </div>
+                
+                <p id="progressDescription" class="progress-description">
+                    全5ステップで完了します。各ステップで必要な情報を入力してください。
+                </p>
+            </div>
+        </section>
+
+        <!-- ローディングアニメーション -->
+        <div class="loading" id="loadingAnimation" aria-live="polite" aria-hidden="true">
+            <div class="loading-content">
+                <div class="spinner" aria-hidden="true"></div>
+                <h3 class="loading-title">計算中...</h3>
+                <p class="loading-subtitle">あなたの生涯収支を詳しく分析しています</p>
+                <div class="loading-steps">
+                    <div class="loading-step active">年金額を計算中</div>
+                    <div class="loading-step">ライフイベント費用を算出中</div>
+                    <div class="loading-step">資産推移を予測中</div>
+                    <div class="loading-step">アドバイスを生成中</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ステップ1: 基本情報 -->
+        <section class="step-section active" id="step1" aria-labelledby="step1-title">
+            <div class="card">
+                <header class="step-header">
+                    <h2 id="step1-title" class="step-title">
+                        <span class="step-icon" aria-hidden="true">📋</span>
+                        基本情報を入力してください
+                    </h2>
+                    <p class="step-description">
+                        年金額やシミュレーション期間を計算するために必要な基本情報を入力します
+                    </p>
+                </header>
+                
+                <div class="form-section">
+                    <fieldset class="form-fieldset">
+                        <legend class="fieldset-legend">個人情報</legend>
+                        
+                        <div class="form-group">
+                            <label class="form-label required" for="birthYear">
+                                <span class="label-text">生年月日</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-birthdate">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-birthdate" role="tooltip">
+                                年金計算やシミュレーション期間の算出に必要です。正確な年月を入力してください。
+                            </div>
+                            
+                            <div class="birthday-input">
+                                <div class="input-wrapper">
+                                    <select class="form-control" id="birthYear" required aria-describedby="birthdate-help">
+                                        <option value="">年を選択</option>
+                                    </select>
+                                    <label class="input-label" for="birthYear">年</label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <select class="form-control" id="birthMonth" required aria-describedby="birthdate-help">
+                                        <option value="">月を選択</option>
+                                    </select>
+                                    <label class="input-label" for="birthMonth">月</label>
+                                </div>
+                            </div>
+                            
+                            <div id="birthdate-help" class="input-help">
+                                例：1985年3月生まれの場合は「1985年」「3月」を選択
+                            </div>
+                            <div id="birthDateError" class="input-error-message" role="alert" style="display:none;"></div>
+                            
+                            <div class="age-display" id="ageDisplay" style="display: none;" aria-live="polite">
+                                <div class="age-display-content">
+                                    <span class="age-display-icon" aria-hidden="true">🎂</span>
+                                    <span class="age-display-text">現在の年齢: <strong id="currentAge">--</strong>歳</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required" for="income">
+                                <span class="label-text">月の手取り収入</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-income">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-income" role="tooltip">
+                                税金・社会保険料を差し引いた、毎月実際に受け取る金額を入力してください。ボーナスは含めず、月平均で計算してください。
+                            </div>
+                            
+                            <div class="input-wrapper">
+                                <input type="number" class="form-control" id="income" 
+                                       placeholder="30.0" min="5" max="300" step="0.1" required
+                                       aria-describedby="income-help income-unit">
+                                <span class="input-unit" id="income-unit">万円</span>
+                            </div>
+                            
+                            <div id="income-help" class="input-help">
+                                <strong>入力例：</strong>額面40万円で手取り32万円の場合 → 「32.0」と入力
+                            </div>
+                            <div id="incomeError" class="input-error-message" role="alert" style="display:none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required" for="occupation">
+                                <span class="label-text">現在の主な職業</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-occupation">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-occupation" role="tooltip">
+                                現在の状況、または今後のキャリアで主となるものを選択してください。厚生年金の加入予定に影響します。
+                            </div>
+                            
+                            <select class="form-control" id="occupation" required aria-describedby="occupation-help">
+                                <option value="">-- 職業を選択してください --</option>
+                                <option value="employee">会社員（厚生年金加入）</option>
+                                <option value="civil_servant">公務員（共済年金）</option>
+                                <option value="self_employed">自営業・フリーランス（国民年金のみ）</option>
+                                <option value="part_time">パート・アルバイト</option>
+                                <option value="other">その他・無職</option>
+                            </select>
+                            
+                            <div id="occupation-help" class="input-help">
+                                転職予定がある場合は、将来長く続ける予定の職業を選択してください
+                            </div>
+                            <div id="occupationError" class="input-error-message" role="alert" style="display:none;"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-fieldset">
+                        <legend class="fieldset-legend">年金加入期間</legend>
+                        <div class="fieldset-description">
+                            将来の年金額を計算するため、これまでの加入実績と今後の加入予定を入力してください
+                        </div>
+                        
+                        <div class="pension-input-group">
+                            <!-- 国民年金セクション -->
+                            <div class="pension-input-item">
+                                <header class="pension-header">
+                                    <h4 class="pension-title">
+                                        <span class="pension-icon" aria-hidden="true">🏛️</span>
+                                        国民年金
+                                    </h4>
+                                    <div class="pension-summary" id="nationalPensionSummary" aria-live="polite">
+                                        合計: 0年 / 最大40年
+                                    </div>
+                                </header>
+                                
+                                <div class="pension-period-group">
+                                    <div class="pension-period-type">
+                                        <label class="form-label" for="nationalPension実績Years">
+                                            <span class="label-text">これまでの加入実績</span>
+                                            <span class="label-annotation">（20歳〜現在）</span>
+                                        </label>
+                                        
+                                        <div class="pension-slider-container">
+                                            <input type="range" class="pension-slider" id="nationalPension実績Slider" 
+                                                   min="0" max="40" value="0" step="1" 
+                                                   aria-describedby="nationalPension実績Help">
+                                            
+                                            <div class="pension-value-display">
+                                                <span class="range-min" id="nationalPension実績SliderMinLabel">0年</span>
+                                                <div class="pension-years-input-wrapper">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="nationalPension実績Years" data-step="-1" 
+                                                            aria-label="実績年数を1年減らす">
+                                                        <span aria-hidden="true">−</span>
+                                                    </button>
+                                                    <input type="number" class="pension-years-input" id="nationalPension実績Years" 
+                                                           min="0" max="40" value="0" required 
+                                                           aria-describedby="nationalPension実績Help">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="nationalPension実績Years" data-step="1" 
+                                                            aria-label="実績年数を1年増やす">
+                                                        <span aria-hidden="true">＋</span>
+                                                    </button>
+                                                    <span class="input-unit">年</span>
+                                                </div>
+                                                <span class="range-max" id="nationalPension実績SliderMaxLabel">40年</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="nationalPension実績Help" class="input-help">
+                                            学生時代や転職の空白期間は除いてください
+                                        </div>
+                                        <div id="nationalPension実績YearsError" class="input-error-message" role="alert" style="display:none;"></div>
+                                    </div>
+
+                                    <div class="pension-period-type">
+                                        <label class="form-label" for="nationalPension予定Years">
+                                            <span class="label-text">これからの加入予定</span>
+                                            <span class="label-annotation">（現在〜60歳）</span>
+                                        </label>
+                                        
+                                        <div class="pension-slider-container">
+                                            <input type="range" class="pension-slider" id="nationalPension予定Slider" 
+                                                   min="0" max="40" value="20" step="1" 
+                                                   aria-describedby="nationalPension予定Help">
+                                            
+                                            <div class="pension-value-display">
+                                                <span class="range-min" id="nationalPension予定SliderMinLabel">0年</span>
+                                                <div class="pension-years-input-wrapper">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="nationalPension予定Years" data-step="-1" 
+                                                            aria-label="予定年数を1年減らす">
+                                                        <span aria-hidden="true">−</span>
+                                                    </button>
+                                                    <input type="number" class="pension-years-input" id="nationalPension予定Years" 
+                                                           min="0" max="40" value="20" required 
+                                                           aria-describedby="nationalPension予定Help">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="nationalPension予定Years" data-step="1" 
+                                                            aria-label="予定年数を1年増やす">
+                                                        <span aria-hidden="true">＋</span>
+                                                    </button>
+                                                    <span class="input-unit">年</span>
+                                                </div>
+                                                <span class="range-max" id="nationalPension予定SliderMaxLabel">40年</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="nationalPension予定Help" class="input-help">
+                                            今後フリーランスになる予定がある場合は調整してください
+                                        </div>
+                                        <div id="nationalPension予定YearsError" class="input-error-message" role="alert" style="display:none;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="nationalPensionTotalError" class="input-error-message" role="alert" style="display:none;"></div>
+                                <div id="nationalPensionGuidance" class="pension-guidance-message" aria-live="polite" style="display:none;"></div>
+                                
+                                <div class="pension-note">
+                                    <svg class="note-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    国民年金は20歳から60歳まで加入義務があり、最大40年間です
+                                </div>
+                            </div>
+
+                            <!-- 厚生年金セクション -->
+                            <div class="pension-input-item" id="employeePensionItem">
+                                <header class="pension-header">
+                                    <h4 class="pension-title">
+                                        <span class="pension-icon" aria-hidden="true">🏢</span>
+                                        厚生年金
+                                    </h4>
+                                    <div class="pension-summary" id="employeePensionSummary" aria-live="polite">
+                                        合計: 0年 / 最大52年
+                                    </div>
+                                </header>
+                                
+                                <div class="pension-period-group">
+                                    <div class="pension-period-type">
+                                        <label class="form-label" for="employeePension実績Years">
+                                            <span class="label-text">これまでの加入実績</span>
+                                            <span class="label-annotation">（18歳〜現在）</span>
+                                        </label>
+                                        
+                                        <div class="pension-slider-container">
+                                            <input type="range" class="pension-slider" id="employeePension実績Slider" 
+                                                   min="0" max="50" value="0" step="1" 
+                                                   aria-describedby="employeePension実績Help">
+                                            
+                                            <div class="pension-value-display">
+                                                <span class="range-min" id="employeePension実績SliderMinLabel">0年</span>
+                                                <div class="pension-years-input-wrapper">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="employeePension実績Years" data-step="-1" 
+                                                            aria-label="実績年数を1年減らす">
+                                                        <span aria-hidden="true">−</span>
+                                                    </button>
+                                                    <input type="number" class="pension-years-input" id="employeePension実績Years" 
+                                                           min="0" max="50" value="0" 
+                                                           aria-describedby="employeePension実績Help">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="employeePension実績Years" data-step="1" 
+                                                            aria-label="実績年数を1年増やす">
+                                                        <span aria-hidden="true">＋</span>
+                                                    </button>
+                                                    <span class="input-unit">年</span>
+                                                </div>
+                                                <span class="range-max" id="employeePension実績SliderMaxLabel">50年</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="employeePension実績Help" class="input-help">
+                                            会社員・公務員として働いた期間を入力してください
+                                        </div>
+                                        <div id="employeePension実績YearsError" class="input-error-message" role="alert" style="display:none;"></div>
+                                    </div>
+
+                                    <div class="pension-period-type">
+                                        <label class="form-label" for="employeePension予定Years">
+                                            <span class="label-text">これからの加入予定</span>
+                                            <span class="label-annotation">（現在〜退職予定）</span>
+                                        </label>
+                                        
+                                        <div class="pension-slider-container">
+                                            <input type="range" class="pension-slider" id="employeePension予定Slider" 
+                                                   min="0" max="50" value="20" step="1" 
+                                                   aria-describedby="employeePension予定Help">
+                                            
+                                            <div class="pension-value-display">
+                                                <span class="range-min" id="employeePension予定SliderMinLabel">0年</span>
+                                                <div class="pension-years-input-wrapper">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="employeePension予定Years" data-step="-1" 
+                                                            aria-label="予定年数を1年減らす">
+                                                        <span aria-hidden="true">−</span>
+                                                    </button>
+                                                    <input type="number" class="pension-years-input" id="employeePension予定Years" 
+                                                           min="0" max="50" value="20" 
+                                                           aria-describedby="employeePension予定Help">
+                                                    <button type="button" class="pension-years-stepper" 
+                                                            data-target="employeePension予定Years" data-step="1" 
+                                                            aria-label="予定年数を1年増やす">
+                                                        <span aria-hidden="true">＋</span>
+                                                    </button>
+                                                    <span class="input-unit">年</span>
+                                                </div>
+                                                <span class="range-max" id="employeePension予定SliderMaxLabel">50年</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="employeePension予定Help" class="input-help">
+                                            今後自営業になる予定がある場合は0年に設定してください
+                                        </div>
+                                        <div id="employeePension予定YearsError" class="input-error-message" role="alert" style="display:none;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="employeePensionTotalError" class="input-error-message" role="alert" style="display:none;"></div>
+                                <div id="employeePensionGuidance" class="pension-guidance-message" aria-live="polite" style="display:none;"></div>
+                                
+                                <div class="pension-note">
+                                    <svg class="note-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    厚生年金は70歳まで加入可能で、加入期間が長いほど年金額が増えます
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                
+                <!-- 年金概算表示 -->
+                <div class="results-preview" id="pensionEstimate" style="display: none;" aria-live="polite">
+                    <header class="results-preview-header">
+                        <h3 class="results-preview-title">
+                            <span class="results-icon" aria-hidden="true">📊</span>
+                            将来の年金月額（概算）
+                        </h3>
+                        <p class="results-preview-subtitle">
+                            入力内容に基づく概算額です。実際の年金額とは異なる場合があります
+                        </p>
+                    </header>
+                    
+                    <div class="results-preview-grid">
+                        <div class="result-preview-item">
+                            <div class="result-preview-value" id="nationalPensionAmount">0円</div>
+                            <div class="result-preview-label">国民年金（月額）</div>
+                        </div>
+                        <div class="result-preview-item">
+                            <div class="result-preview-value" id="employeePensionAmount">0円</div>
+                            <div class="result-preview-label">厚生年金（月額）</div>
+                        </div>
+                        <div class="result-preview-item highlight">
+                            <div class="result-preview-value" id="totalPensionAmount">0円</div>
+                            <div class="result-preview-label">年金合計（月額）</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="step-navigation" aria-label="ステップナビゲーション">
+                <div class="step-buttons">
+                    <button class="btn btn--primary btn--large" onclick="nextStep()">
+                        <span>次へ：固定費入力</span>
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg>
+                    </button>
+                </div>
+                <div class="step-info">
+                    <span class="step-counter">1 / 5</span>
+                    <span class="step-time">約3分で完了</span>
+                </div>
+            </nav>
+        </section>
+
+        <!-- ステップ2: 固定費 -->
+        <section class="step-section" id="step2" aria-labelledby="step2-title">
+            <div class="card">
+                <header class="step-header">
+                    <h2 id="step2-title" class="step-title">
+                        <span class="step-icon" aria-hidden="true">💳</span>
+                        固定費を入力してください
+                    </h2>
+                    <p class="step-description">
+                        毎月必ず支払っている費用を入力してください。支払いのない項目は空欄のままで構いません
+                    </p>
+                </header>
+
+                <div class="form-section">
+                    <div class="form-instructions">
+                        <div class="instruction-item">
+                            <span class="instruction-icon" aria-hidden="true">💡</span>
+                            <span>金額は万円単位で入力してください（例：8万円の場合は「8.0」）</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="instruction-icon" aria-hidden="true">📝</span>
+                            <span>支払いのない項目は空欄にするか0を入力してください</span>
+                        </div>
+                    </div>
+                    
+                    <div class="fixed-costs-grid" id="fixedCostsGrid" role="group" aria-labelledby="fixed-costs-legend">
+                        <h3 id="fixed-costs-legend" class="sr-only">固定費の入力</h3>
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+                
+                <!-- 固定費サマリー -->
+                <div class="results-preview" aria-live="polite">
+                    <header class="results-preview-header">
+                        <h3 class="results-preview-title">
+                            <span class="results-icon" aria-hidden="true">📊</span>
+                            固定費の合計
+                        </h3>
+                    </header>
+                    
+                    <div class="results-preview-grid">
+                        <div class="result-preview-item">
+                            <div class="result-preview-value" id="totalFixedCosts">0.0万円</div>
+                            <div class="result-preview-label">月額合計</div>
+                        </div>
+                        <div class="result-preview-item">
+                            <div class="result-preview-value" id="fixedCostsRatio">0%</div>
+                            <div class="result-preview-label">収入に対する比率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="ratio-advice" id="ratioAdvice" aria-live="polite">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="step-navigation" aria-label="ステップナビゲーション">
+                <div class="step-buttons">
+                    <button class="btn btn--secondary" onclick="prevStep()">
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg>
+                        <span>戻る</span>
+                    </button>
+                    <button class="btn btn--primary btn--large" onclick="nextStep()">
+                        <span>次へ：ライフイベント</span>
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg>
+                    </button>
+                </div>
+                <div class="step-info">
+                    <span class="step-counter">2 / 5</span>
+                    <span class="step-time">残り約5分</span>
+                </div>
+            </nav>
+        </section>
+
+        <!-- ステップ3: ライフイベント -->
+        <section class="step-section" id="step3" aria-labelledby="step3-title">
+            <div class="card">
+                <header class="step-header">
+                    <h2 id="step3-title" class="step-title">
+                        <span class="step-icon" aria-hidden="true">🎯</span>
+                        ライフイベントを選択してください
+                    </h2>
+                    <p class="step-description">
+                        将来予定している、または考慮したいライフイベントを選択してください
+                    </p>
+                </header>
+
+                <div class="form-section">
+                    <div class="life-events-grid" id="lifeEventsGrid" role="group" aria-labelledby="life-events-legend">
+                        <h3 id="life-events-legend" class="sr-only">ライフイベントの選択</h3>
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                    
+                    <!-- ライフイベント詳細設定 -->
+                    <div id="lifeEventSpecificSettingsContainer" class="event-details-section">
+                        <header class="section-header">
+                            <h3 class="section-title">詳細設定</h3>
+                            <p class="section-description">選択したライフイベントの詳細を設定してください</p>
+                        </header>
+                        
+                        <div class="event-details-grid">
+                            <div class="form-group" id="childrenCountGroup" style="display: none;" data-event-key="children">
+                                <label class="form-label" for="childrenCount">
+                                    <span class="label-text">子どもの予定人数</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="number" class="form-control" id="childrenCount" 
+                                           min="0" max="10" value="1" required aria-describedby="childrenCount-help">
+                                    <span class="input-unit">人</span>
+                                </div>
+                                <div id="childrenCount-help" class="input-help">
+                                    0人の場合は子育て関連費用は計上されません
+                                </div>
+                                <div id="childrenCountError" class="input-error-message" role="alert" style="display:none;"></div>
+                            </div>
+                            
+                            <div class="form-group" id="housingAgeGroup" style="display: none;" data-event-key="housing">
+                                <label class="form-label" for="housingAge">
+                                    <span class="label-text">住宅購入予定年齢</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="number" class="form-control" id="housingAge" 
+                                           min="20" max="70" value="35" required aria-describedby="housingAge-help">
+                                    <span class="input-unit">歳</span>
+                                </div>
+                                <div id="housingAge-help" class="input-help">
+                                    現在年齢より若い年齢は設定できません
+                                </div>
+                                <div id="housingAgeError" class="input-error-message" role="alert" style="display:none;"></div>
+                            </div>
+                            
+                            <div class="form-group" id="nisaAmountGroup" style="display: none;" data-event-key="nisa">
+                                <label class="form-label" for="nisaAmount">
+                                    <span class="label-text">つみたてNISAなどの月額積立額</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="number" class="form-control" id="nisaAmount" 
+                                           min="0.1" max="30" value="3.3" step="0.1" required aria-describedby="nisaAmount-help">
+                                    <span class="input-unit">万円</span>
+                                </div>
+                                <div id="nisaAmount-help" class="input-help">
+                                    <strong>参考：</strong>新NISA年間投資上限360万円（月額30万円相当）
+                                </div>
+                                <div class="nisa-info">
+                                    新NISAではつみたて投資枠120万円＋成長投資枠240万円の合計360万円が年間の投資上限です
+                                </div>
+                                <div id="nisaAmountError" class="input-error-message" role="alert" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- カスタムライフイベント -->
+                    <div class="custom-events-section">
+                        <header class="section-header">
+                            <h3 class="section-title">
+                                <span class="section-icon" aria-hidden="true">💰</span>
+                                その他の大きな支出
+                            </h3>
+                            <p class="section-description">
+                                上記以外に予定している大きな一時支出があれば追加してください
+                            </p>
+                        </header>
+                        
+                        <div class="custom-events-examples">
+                            <div class="example-item">海外留学：200万円</div>
+                            <div class="example-item">住宅リフォーム：300万円</div>
+                            <div class="example-item">起業資金：500万円</div>
+                        </div>
+                        
+                        <div class="custom-events-list">
+                            <div class="custom-events-placeholder" id="customEventsPlaceholder">
+                                <span class="placeholder-icon" aria-hidden="true">📝</span>
+                                <span>大きな支出はまだ登録されていません</span>
+                            </div>
+                            <div id="customLifeEventsList">
+                                <!-- JavaScriptで動的に生成 -->
+                            </div>
+                        </div>
+                        
+                        <!-- カスタムイベント入力フォーム -->
+                        <div id="customEventFormContainer" class="custom-event-form" style="display: none;">
+                            <header class="form-header">
+                                <h4 id="customEventFormTitle" class="form-title">支出の追加</h4>
+                            </header>
+                            
+                            <input type="hidden" id="customEventId">
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required" for="customEventName">
+                                        <span class="label-text">支出の名称</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="customEventName" 
+                                           placeholder="例：海外留学費用" required aria-describedby="customEventName-help">
+                                    <div id="customEventName-help" class="input-help">
+                                        具体的で分かりやすい名称を入力してください
+                                    </div>
+                                    <div id="customEventNameError" class="input-error-message" role="alert" style="display:none;"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label required" for="customEventAmount">
+                                        <span class="label-text">金額</span>
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="number" class="form-control" id="customEventAmount" 
+                                               placeholder="200" min="1" step="1" required aria-describedby="customEventAmount-help">
+                                        <span class="input-unit">万円</span>
+                                    </div>
+                                    <div id="customEventAmount-help" class="input-help">
+                                        万円単位で入力してください（例：200万円の場合は「200」）
+                                    </div>
+                                    <div id="customEventAmountError" class="input-error-message" role="alert" style="display:none;"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label required" for="customEventAge">
+                                        <span class="label-text">発生する年齢</span>
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="number" class="form-control" id="customEventAge" 
+                                               placeholder="30" min="18" max="100" required aria-describedby="customEventAge-help">
+                                        <span class="input-unit">歳</span>
+                                    </div>
+                                    <div id="customEventAge-help" class="input-help">
+                                        支出が発生する予定の年齢を入力してください
+                                    </div>
+                                    <div id="customEventAgeError" class="input-error-message" role="alert" style="display:none;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn--secondary" id="cancelCustomEventButton">
+                                    キャンセル
+                                </button>
+                                <button type="button" class="btn btn--primary" id="saveCustomEventButton">
+                                    <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-check"></use></svg>
+                                    <span>支出を保存</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn--outline btn--add" id="addCustomEventButton">
+                            <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-plus"></use></svg>
+                            <span>大きな支出を追加</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="step-navigation" aria-label="ステップナビゲーション">
+                <div class="step-buttons">
+                    <button class="btn btn--secondary" onclick="prevStep()">
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg>
+                        <span>戻る</span>
+                    </button>
+                    <button class="btn btn--primary btn--large" onclick="nextStep()">
+                        <span>次へ：詳細設定</span>
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-right"></use></svg>
+                    </button>
+                </div>
+                <div class="step-info">
+                    <span class="step-counter">3 / 5</span>
+                    <span class="step-time">残り約3分</span>
+                </div>
+            </nav>
+        </section>
+
+        <!-- ステップ4: 詳細設定 -->
+        <section class="step-section" id="step4" aria-labelledby="step4-title">
+            <div class="card">
+                <header class="step-header">
+                    <h2 id="step4-title" class="step-title">
+                        <span class="step-icon" aria-hidden="true">⚙️</span>
+                        詳細設定（オプション）
+                    </h2>
+                    <p class="step-description">
+                        より詳細なシミュレーションのための設定です。デフォルト値でも十分な計算が可能です
+                    </p>
+                </header>
+
+                <div class="form-section">
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="retirementAge">
+                                <span class="label-text">リタイア希望年齢</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-retirement">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-retirement" role="tooltip">
+                                働くことをやめる予定の年齢です。早期リタイアや定年延長を考慮して設定してください。65歳が一般的です。
+                            </div>
+                            
+                            <div class="input-wrapper">
+                                <input type="number" class="form-control" id="retirementAge" 
+                                       min="55" max="75" value="65" required aria-describedby="retirementAge-help">
+                                <span class="input-unit">歳</span>
+                            </div>
+                            <div id="retirementAge-help" class="input-help">
+                                一般的な定年は65歳です。早期リタイアは慎重に検討してください
+                            </div>
+                            <div id="retirementAgeError" class="input-error-message" role="alert" style="display:none;"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="expectedLifeExpectancy">
+                                <span class="label-text">想定寿命</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-life">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-life" role="tooltip">
+                                シミュレーションを行う最終年齢です。長めに設定することで、より保守的で安全な資金計画を立てられます。
+                            </div>
+                            
+                            <div class="input-wrapper">
+                                <input type="number" class="form-control" id="expectedLifeExpectancy" 
+                                       min="80" max="100" value="95" required aria-describedby="expectedLifeExpectancy-help">
+                                <span class="input-unit">歳</span>
+                            </div>
+                            <div id="expectedLifeExpectancy-help" class="input-help">
+                                日本人の平均寿命は男性81歳、女性87歳です（2023年）
+                            </div>
+                            <div id="expectedLifeExpectancyError" class="input-error-message" role="alert" style="display:none;"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="investmentReturnRate">
+                                <span class="label-text">NISA等 期待運用利回り</span>
+                                <button type="button" class="tooltip-trigger" aria-describedby="tooltip-investrate">
+                                    <svg class="tooltip-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                                    <span class="sr-only">ヘルプを表示</span>
+                                </button>
+                            </label>
+                            <div class="tooltip-content" id="tooltip-investrate" role="tooltip">
+                                NISAなどで投資を行う場合の年平均リターン率です。過去20年の全世界株式の平均は約5-7%ですが、保守的に3-4%で設定することを推奨します。
+                            </div>
+                            
+                            <div class="input-wrapper">
+                                <input type="number" class="form-control" id="investmentReturnRate" 
+                                       min="0" max="15" value="3" step="0.1" required aria-describedby="investmentReturnRate-help">
+                                <span class="input-unit">% / 年</span>
+                            </div>
+                            <div id="investmentReturnRate-help" class="input-help">
+                                <strong>推奨値：</strong>保守的 3%、バランス型 5%、積極的 7%
+                            </div>
+                            <div id="investmentReturnRateError" class="input-error-message" role="alert" style="display:none;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-note">
+                        <div class="note-content">
+                            <svg class="note-icon" aria-hidden="true"><use xlink:href="#icon-info"></use></svg>
+                            <div class="note-text">
+                                <strong>注意：</strong>これらの設定値は将来の不確実性を含んでいます。
+                                定期的に見直しを行い、実際の状況に応じて調整することをお勧めします。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="step-navigation" aria-label="ステップナビゲーション">
+                <div class="step-buttons">
+                    <button class="btn btn--secondary" onclick="prevStep()">
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg>
+                        <span>戻る</span>
+                    </button>
+                    <button class="btn btn--primary btn--large btn--calculate" onclick="calculateResults()">
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-calculator"></use></svg>
+                        <span>結果を計算</span>
+                    </button>
+                </div>
+                <div class="step-info">
+                    <span class="step-counter">4 / 5</span>
+                    <span class="step-time">計算まであと少し</span>
+                </div>
+            </nav>
+        </section>
+
+        <!-- ステップ5: 結果 -->
+        <section class="step-section" id="step5" aria-labelledby="step5-title">
+            <div class="card">
+                <header class="step-header">
+                    <h2 id="step5-title" class="step-title">
+                        <span class="step-icon" aria-hidden="true">📊</span>
+                        生涯収支シミュレーション結果
+                    </h2>
+                    <p class="step-description">
+                        入力いただいた情報に基づいて、あなたの生涯収支を詳しく分析しました
+                    </p>
+                </header>
+
+                <div class="results-section">
+                    <!-- メイン結果表示 -->
+                    <div class="results-hero" aria-live="polite">
+                        <div class="rating-display" id="ratingDisplay">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                        <div class="results-main-summary" id="resultsMainSummary">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 結果サマリーカード -->
+                    <div class="results-summary-section">
+                        <h3 class="summary-section-title">主要な数値</h3>
+                        <div class="results-summary-grid" id="resultsSummaryCards" aria-live="polite">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 資産推移チャート -->
+                    <div class="chart-section">
+                        <header class="chart-header">
+                            <h3 class="chart-title">年代別資産推移</h3>
+                            <p class="chart-subtitle">あなたの年齢に応じた資産の変化を確認できます</p>
+                        </header>
+                        
+                        <div class="chart-wrapper">
+                            <div id="chartPlaceholder" class="chart-placeholder">
+                                <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-chart-placeholder"></use></svg>
+                                <div class="placeholder-content">
+                                    <h4>グラフを準備中...</h4>
+                                    <p>シミュレーション結果を計算すると、ここに詳細なグラフが表示されます</p>
+                                </div>
+                            </div>
+                            <canvas id="lifetimeChart" style="display: none;" aria-label="年代別資産推移グラフ"></canvas>
+                        </div>
+                        
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color total-assets"></div>
+                                <span>総資産（現金＋投資）</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color cash-balance"></div>
+                                <span>現金残高</span>
+                            </div>
+                            <div class="legend-item nisa-legend" style="display: none;">
+                                <div class="legend-color nisa-balance"></div>
+                                <span>NISA評価額</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- アドバイスセクション -->
+                    <div class="advice-section" aria-live="polite">
+                        <header class="advice-header">
+                            <h3 class="advice-title">
+                                <span class="advice-icon" aria-hidden="true">💡</span>
+                                パーソナライズされたアドバイス
+                            </h3>
+                            <p class="advice-subtitle">
+                                あなたの状況に合わせた具体的な改善提案をご覧ください
+                            </p>
+                        </header>
+                        
+                        <div id="advicePlaceholder" class="advice-placeholder">
+                            <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-advice-placeholder"></use></svg>
+                            <div class="placeholder-content">
+                                <h4>アドバイスを準備中...</h4>
+                                <p>シミュレーション結果に基づいた具体的なアドバイスがここに表示されます</p>
+                            </div>
+                        </div>
+                        
+                        <div class="advice-content" id="adviceContent" style="display: none;">
+                            <!-- JavaScriptで動的に生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="step-navigation" aria-label="アクションメニュー">
+                <div class="step-buttons">
+                    <button class="btn btn--secondary" onclick="prevStep()">
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-arrow-left"></use></svg>
+                        <span>設定を修正</span>
+                    </button>
+                    <button class="btn btn--outline" onclick="resetApp()">
+                        <span>最初からやり直す</span>
+                    </button>
+                    <button class="btn btn--success" onclick="exportResults()">
+                        <span>結果をエクスポート</span>
+                        <svg class="btn-icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
+                    </button>
+                </div>
+                <div class="step-info completed">
+                    <span class="step-counter">完了</span>
+                    <span class="step-time">お疲れさまでした</span>
+                </div>
+            </nav>
+        </section>
+    </div>
+
+    <!-- フッター -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">ご利用にあたって</h3>
+                <ul class="footer-list">
+                    <li>このシミュレーションは一般的な情報提供を目的としています</li>
+                    <li>結果は概算値であり、実際の収支と異なる場合があります</li>
+                    <li>定期的な見直しと専門家への相談をお勧めします</li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">プライバシーについて</h3>
+                <ul class="footer-list">
+                    <li>入力されたデータはお使いの端末にのみ保存されます</li>
+                    <li>外部サーバーへの送信は一切行いません</li>
+                    <li>ブラウザを閉じても設定は保持されます</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 生涯収支シミュレーター. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
