@@ -2830,6 +2830,8 @@ const CalculationEngine = {
     },
 
     performCalculation() {
+        const round1 = v => Math.round(v * 10) / 10;
+
         const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
         if (currentAge === null) {
             throw new Error('年齢が計算できません');
@@ -2840,36 +2842,52 @@ const CalculationEngine = {
 
         let totalIncome = 0;
         let totalExpenses = 0;
-        let yearlyData = [];
         let nisaBalance = 0;
         let cashBalance = 0;
+        const yearlyData = [];
 
-        // 年ごとの計算
         for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
-            const yearData = this.calculateYearData(age, currentAge, retirementAge, invRate, nisaBalance, cashBalance);
-            
-            totalIncome = Utils.preciseAdd(totalIncome, yearData.income);
-            totalExpenses = Utils.preciseAdd(totalExpenses, yearData.cashExpense);
-            nisaBalance = yearData.nisaBalance;
-            cashBalance = yearData.cumulativeCash;
-            
-            yearlyData.push(yearData);
+            const raw = this.calculateYearData(age, currentAge, retirementAge, invRate, nisaBalance, cashBalance);
+
+            // 合計値の更新（精密計算）
+            totalIncome = Utils.preciseAdd(totalIncome, raw.income);
+            totalExpenses = Utils.preciseAdd(totalExpenses, raw.cashExpense);
+
+            nisaBalance = raw.nisaBalance;
+            cashBalance = raw.cumulativeCash;
+
+            // 表示用に四捨五入したデータを格納
+            yearlyData.push({
+                age,
+                income: round1(raw.income),
+                cashExpense: round1(raw.cashExpense),
+                nisaInvestment: round1(raw.nisaInvestment),
+                netCashFlow: round1(raw.netCashFlow),
+                cumulativeCash: round1(raw.cumulativeCash),
+                nisaBalance: round1(raw.nisaBalance),
+                totalAssets: round1(raw.totalAssets)
+            });
         }
 
-        const finalBalance = Utils.preciseAdd(cashBalance, nisaBalance);
+        const finalBalance = round1(cashBalance + nisaBalance);
         const retirementData = yearlyData.find(d => d.age === retirementAge) || yearlyData[yearlyData.length - 1];
 
+        const rating = this.calculateRating(finalBalance, totalIncome, expectedLifeExpectancy - currentAge);
+        const rankMap = { S: 1, A: 2, B: 3, C: 4, D: 5 };
+        const generationRank = rankMap[rating] || 5;
+
         return {
-            totalIncome,
-            totalExpenses,
+            totalIncome: round1(totalIncome),
+            totalExpenses: round1(totalExpenses),
             finalBalance,
-            retirementAssets: retirementData?.totalAssets || 0,
-            retirementCash: retirementData?.cumulativeCash || 0,
-            retirementNisa: retirementData?.nisaBalance || 0,
+            retirementAssets: retirementData.totalAssets,
+            retirementCash: retirementData.cumulativeCash,
+            retirementNisa: retirementData.nisaBalance,
             nisaFinalContribution: yearlyData.reduce((sum, d) => Utils.preciseAdd(sum, d.nisaInvestment), 0),
-            nisaFinalBalance: nisaBalance,
+            nisaFinalBalance: round1(nisaBalance),
             yearlyData,
-            rating: this.calculateRating(finalBalance, totalIncome, expectedLifeExpectancy - currentAge)
+            rating,
+            generationRank
         };
     },
 
