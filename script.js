@@ -2298,18 +2298,39 @@ const ResultsManager = {
 
     renderChart() {
         const ctx = Utils.getElement('lifetimeChart', false);
-        if (!ctx) return;
+        if (!ctx) {
+            console.error('Chart canvas not found');
+            return;
+        }
+
+        // Chart.jsが読み込まれているかを確認
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            UIManager.updatePlaceholders(false);
+            NotificationManager.show('グラフライブラリの読み込みに失敗しました', 'error');
+            return;
+        }
 
         const canvasCtx = ctx.getContext('2d');
+        if (!canvasCtx) {
+            console.error('Cannot get 2D context from canvas');
+            return;
+        }
+
         const data = appState.results.yearlyData;
 
-        // 既存のチャートを破棄
-        if (lifetimeChart) {
-            lifetimeChart.destroy();
+        // 既存のチャートを安全に破棄
+        if (lifetimeChart && typeof lifetimeChart.destroy === 'function') {
+            try {
+                lifetimeChart.destroy();
+            } catch (error) {
+                console.warn('Error destroying existing chart:', error);
+            }
             lifetimeChart = null;
         }
 
-        if (!data || data.length === 0) {
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            console.warn('Invalid chart data');
             UIManager.updatePlaceholders(false);
             return;
         }
