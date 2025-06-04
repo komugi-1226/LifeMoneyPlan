@@ -2944,8 +2944,16 @@ const AppInitializer = {
             }
 
             const exportData = this.generateExportData();
-            this.downloadExportPDF(exportData);
-            
+
+            // PDFとJSONの両方を提供
+            const choice = confirm('結果をエクスポートします。\n\n「OK」= PDF形式（印刷プレビュー）\n「キャンセル」= JSON形式（データファイル）');
+
+            if (choice) {
+                this.downloadExportPDF(exportData);
+            } else {
+                this.downloadExportData(exportData);
+            }
+
         } catch (error) {
             Utils.handleError(error, 'Results export');
         }
