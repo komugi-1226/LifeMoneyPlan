@@ -2715,8 +2715,8 @@ const AppInitializer = {
         window.calculateResults = () => CalculationEngine.calculate();
         window.resetApp = () => this.resetApplication();
         window.exportResults = () => this.exportResults();
-        window.downloadChartImage = () => ResultsManager.downloadChartImage();
-        window.shareResults = () => ResultsManager.shareResults();
+        window.downloadChartImage = () => AppInitializer.downloadChartImage();
+        window.shareResults = () => AppInitializer.shareResults();
         window.saveSettings = () => {
             if (StorageManager.save(appState)) {
                 NotificationManager.show('設定を保存しました', 'success');
