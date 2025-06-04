@@ -651,27 +651,108 @@ function downloadChartImage() {
 }
 
 // SNS共有
-function shareResults() {
-    if (navigator.share) {
-        navigator.share({
-            title: '人生おかね診断 - 結果',
-            text: '私の生涯収支シミュレーション結果をチェック！',
-            url: window.location.href
-        }).then(() => {
-            premiumUX.showNotification('success', '共有完了', 
-                '結果が正常に共有されました');
-        }).catch((error) => {
-            premiumUX.handleError(error, 'shareResults');
+// SNS共有用シェアカード生成
+async function generateShareCard() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+
+    // 背景
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const { rating, finalBalance, yearlyData } = appState.results;
+    const finalText = Utils.formatCurrency(finalBalance);
+
+    const rankTexts = {
+        'S': '同世代上位5%',
+        'A': '同世代上位20%',
+        'B': '同世代平均',
+        'C': '同世代下位20%',
+        'D': '同世代下位5%'
+    };
+
+    // ランクバッジ
+    ctx.fillStyle = '#2563eb';
+    ctx.font = 'bold 120px sans-serif';
+    ctx.fillText(rating, 60, 150);
+
+    // 最終資産額
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 60px sans-serif';
+    ctx.fillText(`予測総資産: ${finalText}`, 60, 260);
+
+    // 同世代順位
+    ctx.font = '48px sans-serif';
+    ctx.fillText(rankTexts[rating] || '', 60, 330);
+
+    // ミニラインチャート
+    const chartX = 60;
+    const chartY = 360;
+    const chartW = 700;
+    const chartH = 200;
+
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.strokeRect(chartX, chartY, chartW, chartH);
+
+    if (yearlyData && yearlyData.length > 1) {
+        const values = yearlyData.map(d => d.totalAssets);
+        const minV = Math.min(...values);
+        const maxV = Math.max(...values);
+        const stepX = chartW / (values.length - 1);
+
+        ctx.beginPath();
+        values.forEach((v, i) => {
+            const x = chartX + stepX * i;
+            const yRatio = (v - minV) / (maxV - minV || 1);
+            const y = chartY + chartH - yRatio * chartH;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         });
-    } else {
-        // Web Share API非対応の場合
-        const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
-            premiumUX.showNotification('success', 'リンクコピー', 
-                'URLがクリップボードにコピーされました');
-        }).catch((error) => {
-            premiumUX.handleError(error, 'copyLink');
-        });
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+
+    // ロゴ
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 48px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('人生おかね診断', 1140, 560);
+
+    // QRコード
+    const qrSize = 150;
+    const qrImg = new Image();
+    qrImg.crossOrigin = 'anonymous';
+    qrImg.src = `https://chart.googleapis.com/chart?cht=qr&chs=${qrSize}x${qrSize}&chl=${encodeURIComponent(window.location.href)}`;
+    await new Promise(r => { qrImg.onload = r; qrImg.onerror = r; });
+    ctx.drawImage(qrImg, 1140 - qrSize, 560 - qrSize, qrSize, qrSize);
+
+    return canvas;
+}
+
+// SNS共有
+async function shareResults() {
+    try {
+        const shareCanvas = await generateShareCard();
+        const blob = await new Promise(res => shareCanvas.toBlob(res));
+        if (!blob) throw new Error('Blob生成に失敗しました');
+        const file = new File([blob], 'share.png', { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: '人生おかね診断' });
+            premiumUX.showNotification('success', '共有完了', '結果を共有しました');
+        } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'share.png';
+            a.click();
+            URL.revokeObjectURL(url);
+            premiumUX.showNotification('info', 'ダウンロード', '画像を保存しました');
+        }
+    } catch (error) {
+        premiumUX.handleError(error, 'shareResults');
     }
 }
 
@@ -4014,32 +4095,29 @@ const AppInitializer = {
         }
     },
 
-    shareResults() {
+    async shareResults() {
         try {
             if (!appState.results.yearlyData || appState.results.yearlyData.length === 0) {
                 NotificationManager.show('まずシミュレーションを実行してください', 'error');
                 return;
             }
 
-            const url = window.location.href;
-            const balance = Utils.formatCurrency(appState.results.finalBalance);
-            const text = `人生おかね診断の結果は${balance}でした！`;
+            const canvas = await generateShareCard();
+            const blob = await new Promise(res => canvas.toBlob(res));
+            if (!blob) throw new Error('Blob生成に失敗しました');
+            const file = new File([blob], 'share.png', { type: 'image/png' });
 
-            if (navigator.share) {
-                navigator.share({
-                    title: '人生おかね診断',
-                    text,
-                    url
-                }).catch(err => console.error('Share failed', err));
-            } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-                    NotificationManager.show('共有リンクをコピーしました', 'success');
-                }).catch(err => {
-                    console.error('Clipboard write failed', err);
-                    NotificationManager.show('共有に失敗しました', 'error');
-                });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: '人生おかね診断' });
+                NotificationManager.show('結果を共有しました', 'success');
             } else {
-                NotificationManager.show('このブラウザでは共有機能がサポートされていません', 'error');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'share.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                NotificationManager.show('画像を保存しました', 'info');
             }
         } catch (error) {
             Utils.handleError(error, 'Share results');
