@@ -468,29 +468,105 @@ function closeQuickGuide() {
 
 // 結果計算（基本版）
 function calculateResults() {
-    // ローディング表示
     const loading = document.getElementById('loadingAnimation');
     if (loading) {
         loading.classList.add('active');
         loading.setAttribute('aria-hidden', 'false');
     }
-    
-    premiumUX.showNotification('info', '計算開始', 
+
+    premiumUX.showNotification('info', '計算開始',
         'あなたの生涯収支を詳しく分析しています...');
-    
-    // 実際の計算処理は別途実装
+
+    const round1 = (v) => Math.round(v * 10) / 10;
+
     setTimeout(() => {
-        if (loading) {
-            loading.classList.remove('active');
-            loading.setAttribute('aria-hidden', 'true');
+        try {
+            const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
+            const { retirementAge, expectedLifeExpectancy, investmentReturnRate } = appState.advancedSettings;
+            const invRate = investmentReturnRate / 100;
+
+            let yearlyData = [];
+            let nisaBalance = 0;
+            let cashBalance = 0;
+            let totalIncome = 0;
+            let totalExpenses = 0;
+
+            const yearlyFixed = Object.values(appState.fixedCosts)
+                .reduce((s, c) => c.isActive ? s + c.amount : s, 0) * 12;
+
+            for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
+                const income = age < retirementAge
+                    ? round1(appState.basicInfo.income * 12)
+                    : round1(CalculationEngine.getPensionAmount() * 12);
+
+                let cashExpense = round1(yearlyFixed);
+                cashExpense = round1(cashExpense + CalculationEngine.calculateLifeEventCosts(age, currentAge));
+
+                let nisaInvestment = 0;
+                if (appState.lifeEvents.nisa && age < retirementAge) {
+                    nisaInvestment = round1((appState.detailSettings.nisaAmount || 0) * 12);
+                }
+
+                nisaBalance = round1((nisaBalance + nisaInvestment) * (1 + invRate));
+
+                const netCashFlow = round1(income - cashExpense - nisaInvestment);
+                cashBalance = round1(cashBalance + netCashFlow);
+
+                yearlyData.push({
+                    age,
+                    income,
+                    cashExpense,
+                    nisaInvestment,
+                    netCashFlow,
+                    cumulativeCash: cashBalance,
+                    nisaBalance,
+                    totalAssets: round1(cashBalance + nisaBalance)
+                });
+
+                totalIncome = Utils.preciseAdd(totalIncome, income);
+                totalExpenses = Utils.preciseAdd(totalExpenses, cashExpense);
+            }
+
+            const finalBalance = round1(cashBalance + nisaBalance);
+            const rating = CalculationEngine.calculateRating(finalBalance, totalIncome,
+                expectedLifeExpectancy - currentAge);
+            const rankMap = { S: 1, A: 2, B: 3, C: 4, D: 5 };
+            const generationRank = rankMap[rating] || 5;
+
+            const retirementData = yearlyData.find(d => d.age === retirementAge) || yearlyData[yearlyData.length - 1];
+
+            appState.results = {
+                totalIncome: round1(totalIncome),
+                totalExpenses: round1(totalExpenses),
+                finalBalance,
+                retirementAssets: retirementData.totalAssets,
+                retirementCash: retirementData.cumulativeCash,
+                retirementNisa: retirementData.nisaBalance,
+                nisaFinalContribution: yearlyData.reduce((sum, d) => Utils.preciseAdd(sum, d.nisaInvestment), 0),
+                nisaFinalBalance: nisaBalance,
+                yearlyData,
+                rating,
+                generationRank
+            };
+
+            if (loading) {
+                loading.classList.remove('active');
+                loading.setAttribute('aria-hidden', 'true');
+            }
+
+            nextStep();
+            ResultsManager.render();
+
+            premiumUX.showNotification('success', '計算完了',
+                '詳細な分析結果をご確認ください！');
+        } catch (error) {
+            premiumUX.handleError(error, 'calculateResults');
+            if (loading) {
+                loading.classList.remove('active');
+                loading.setAttribute('aria-hidden', 'true');
+            }
         }
-        
-        // 結果ステップに移動
-        nextStep();
-        
-        premiumUX.showNotification('success', '計算完了', 
-            '詳細な分析結果をご確認ください！');
-    }, 2000);
+    }, APP_CONFIG.CALCULATION_DELAY);
 }
 
 // アプリケーション初期化
