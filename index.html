@@ -51,10 +51,10 @@
     </svg>
 
     <!-- パフォーマンスインジケーター -->
-    <div id="performanceIndicator" class="performance-indicator" style="display:none;">
+    <div id="performanceIndicator" class="performance-indicator" style="display:none;" aria-live="polite">
         <div class="performance-content">
-            <div class="performance-icon">⚡</div>
-            <div class="performance-text">最適化されたUX体験</div>
+            <div class="performance-icon" aria-hidden="true">⚡</div>
+            <div class="performance-text">計測中...</div>
         </div>
     </div>
 
@@ -966,7 +966,7 @@
                                     <p>シミュレーション結果を計算すると、ここに詳細なグラフが表示されます</p>
                                 </div>
                             </div>
-                            <canvas id="lifetimeChart" style="display: none;" aria-label="年代別資産推移グラフ"></canvas>
+                            <canvas id="lifetimeChart" class="offscreen" aria-label="年代別資産推移グラフ"></canvas>
                         </div>
                         
                         <div class="chart-legend">
