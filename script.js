@@ -1222,7 +1222,7 @@ const StorageManager = {
             const exportData = {
                 exportDate: new Date().toISOString(),
                 version: APP_CONFIG.VERSION,
-                ...data
+                data: StorageManager.load()
             };
 
             const blob = new Blob([JSON.stringify(exportData, null, 2)], {
@@ -1439,12 +1439,16 @@ const UIManager = {
 
         if (showResults) {
             if (chartPlaceholder) chartPlaceholder.style.display = 'none';
-            if (chartCanvas) chartCanvas.style.display = 'block';
+            if (chartCanvas) {
+                chartCanvas.classList.remove('offscreen');
+            }
             if (advicePlaceholder) advicePlaceholder.style.display = 'none';
             if (adviceContent) adviceContent.style.display = 'grid';
         } else {
             if (chartPlaceholder) chartPlaceholder.style.display = 'flex';
-            if (chartCanvas) chartCanvas.style.display = 'none';
+            if (chartCanvas) {
+                chartCanvas.classList.add('offscreen');
+            }
             if (advicePlaceholder) advicePlaceholder.style.display = 'flex';
             if (adviceContent) adviceContent.style.display = 'none';
         }
@@ -2058,25 +2062,27 @@ const FixedCostManager = {
     },
 
     createCostItem(category, savedCost) {
-        const item = document.createElement('div');
+        const item = document.createElement('li');
         item.className = `fixed-cost-item ${savedCost.amount > 0 ? 'active' : ''}`;
-        
+        item.setAttribute('role', 'group');
+        item.setAttribute('aria-labelledby', `label-cost-${category.id}`);
+
         item.innerHTML = `
             <div class="cost-icon" aria-hidden="true">${category.icon}</div>
             <div class="cost-details">
-                <div class="cost-name">${category.name}</div>
+                <label class="cost-name" id="label-cost-${category.id}" for="cost-${category.id}">${category.name}</label>
                 <div class="cost-description">${category.description}</div>
                 <div class="cost-controls">
                     <div class="input-wrapper">
-                        <input type="number" 
-                               class="cost-input form-control" 
+                        <input type="number"
+                               class="cost-input form-control"
                                id="cost-${category.id}"
-                               placeholder="${category.placeholder}" 
-                               min="0" 
-                               max="${category.max}" 
+                               placeholder="${category.placeholder}"
+                               min="0"
+                               max="${category.max}"
                                step="0.1"
                                value="${savedCost.amount > 0 ? savedCost.amount.toFixed(1) : ''}"
-                               aria-label="${category.name}の月額"
+                               aria-labelledby="label-cost-${category.id}"
                                aria-describedby="cost-${category.id}-help">
                         <span class="input-unit">万円</span>
                     </div>
@@ -2220,18 +2226,23 @@ const LifeEventManager = {
 
     createEventItem(event) {
         const isActive = appState.lifeEvents[event.key] || false;
-        
-        const item = document.createElement('div');
-        item.className = `life-event-item ${isActive ? 'selected' : ''}`;
-        item.setAttribute('tabindex', '0');
-        item.setAttribute('role', 'button');
-        item.setAttribute('aria-pressed', isActive);
-        item.dataset.eventKey = event.key;
 
-        item.innerHTML = `
+        const item = document.createElement('li');
+        item.className = `life-event-item ${isActive ? 'selected' : ''}`;
+        item.setAttribute('role', 'group');
+        item.setAttribute('aria-labelledby', `label-event-${event.key}`);
+
+        const button = document.createElement('div');
+        button.className = 'event-button';
+        button.setAttribute('tabindex', '0');
+        button.setAttribute('role', 'button');
+        button.setAttribute('aria-pressed', isActive);
+        button.dataset.eventKey = event.key;
+
+        button.innerHTML = `
             <div class="event-icon" aria-hidden="true">${event.icon}</div>
             <div class="event-content">
-                <div class="event-text">${event.text}</div>
+                <span class="event-text" id="label-event-${event.key}">${event.text}</span>
                 <div class="event-description">${event.description}</div>
             </div>
             <div class="toggle-switch ${isActive ? 'active' : ''}" aria-hidden="true">
@@ -2239,9 +2250,11 @@ const LifeEventManager = {
             </div>
         `;
 
+        item.appendChild(button);
+
         // イベントリスナー設定
-        item.addEventListener('click', () => this.toggleEvent(event.key, item));
-        item.addEventListener('keydown', (e) => {
+        button.addEventListener('click', () => this.toggleEvent(event.key, item));
+        button.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.toggleEvent(event.key, item);
