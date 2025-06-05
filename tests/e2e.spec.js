@@ -1,6 +1,20 @@
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 
+test('step1 to step2 navigation works', async ({ page }) => {
+  const fileUrl = 'file://' + path.resolve(__dirname, '../index.html');
+  await page.goto(fileUrl);
+
+  await page.selectOption('#birthYear', { label: '1985年' });
+  await page.selectOption('#birthMonth', { value: '1' });
+  await page.fill('#income', '30');
+  await page.selectOption('#occupation', 'employee');
+
+  await page.click('#step1 button.btn--primary');
+
+  await expect(page.locator('#step2')).toHaveClass(/active/);
+});
+
 test('can reach results page', async ({ page }) => {
   const fileUrl = 'file://' + path.resolve(__dirname, '../index.html');
   await page.goto(fileUrl);
