@@ -3405,7 +3405,10 @@ const AppInitializer = {
     },
     async init() {
         try {
-            console.log('アプリケーション初期化開始');
+            // ここではアプリを準備します。難しい言葉は置いておいて、
+            // ざっくり「必要なデータを読み込み、画面を設定し、
+            // 最後にちゃんと動いているか確認する」と覚えておいてください。
+            console.log('🚀 アプリケーション初期化開始');
             if (!this.checkBrowserSupport()) {
                 console.warn("Unsupported browser features detected");
             }
@@ -3427,10 +3430,28 @@ const AppInitializer = {
             
             // 初期表示更新
             this.updateInitialDisplay();
-            
+
+            // デバッグ情報の出力（少し待ってから実行）
+            // 1秒後にアプリの状態や画面がきちんと準備できているかを表示します
+            setTimeout(() => {
+                console.log('📊 初期化完了後の状態:');
+                console.log('- appState:', appState);
+                console.log('- DOM elements check:', {
+                    birthYear: !!document.getElementById('birthYear'),
+                    income: !!document.getElementById('income'),
+                    occupation: !!document.getElementById('occupation')
+                });
+
+                // もしUIManager.showValidationStatusがあれば初回バリデーションを実行
+                if (typeof UIManager.showValidationStatus === 'function') {
+                    UIManager.showValidationStatus();
+                }
+            }, 1000);
+
             console.log('アプリケーション初期化完了');
             
         } catch (error) {
+            console.error('❌ 初期化エラー:', error);
             Utils.handleError(error, 'Application initialization');
         }
     },
