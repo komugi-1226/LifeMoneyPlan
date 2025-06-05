@@ -2694,8 +2694,14 @@ const NavigationManager = {
         const errors = StepValidator.validateStep(appState.currentStep);
         const errorCount = StepValidator.showValidationErrors(errors);
         if (errorCount > 0) {
-            NotificationManager.show('入力を確認してね！', 'error');
-            console.warn(errors);
+            // デバッグ情報を詳細表示
+            console.log('Validation errors:', Array.from(errors.entries()));
+            console.log('Current appState:', JSON.stringify(appState.basicInfo, null, 2));
+
+            // ユーザーにより具体的なメッセージを表示
+            const errorMessages = Array.from(errors.values()).join('、');
+            NotificationManager.show(`入力エラー: ${errorMessages}`, 'error', 6000);
+
             const currentSection = Utils.getElement(`step${appState.currentStep}`, false);
             const nextBtn = currentSection?.querySelector('.step-navigation .btn--primary.btn--large');
             if (nextBtn) {
