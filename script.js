@@ -456,15 +456,6 @@ function updateStepLabels() {
     });
 }
 
-// クイックガイドを閉じる
-function closeQuickGuide() {
-    const overlay = document.getElementById('quickGuideOverlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-        premiumUX.showNotification('info', 'ようこそ！', 
-            '素晴らしい家計診断の旅を始めましょう！');
-    }
-}
 
 // 結果計算（基本版）
 function calculateResults() {
