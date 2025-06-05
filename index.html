@@ -77,10 +77,10 @@
     </div>
 
 
-    <div class="container" id="mainContent">
-        <!-- ヘッダーセクション -->
-        <header class="header" role="banner">
-            <div class="header-content">
+    <section class="hero">
+        <div class="inner">
+            <header class="header" role="banner">
+                <div class="header-content">
                 <h1 class="header-title">
                     <span class="header-icon" aria-hidden="true">💰</span>
                     人生おかね診断
@@ -102,8 +102,12 @@
                         <span>データは端末内で安全に処理</span>
                     </div>
                 </div>
-            </div>
-        </header>
+                </div>
+            </header>
+        </div>
+    </section>
+
+    <div class="container" id="mainContent">
 
         <!-- 大きなステップ表示 -->
         <nav class="main-step-tracker" aria-label="ステップ概要">
@@ -954,44 +958,49 @@
                     <!-- 結果サマリーカード -->
                     <div class="results-summary-section">
                         <h3 class="summary-section-title">主要な数値</h3>
-                        <div class="results-summary-grid" id="resultsSummaryCards" aria-live="polite">
+                        <div class="results-summary-grid cards" id="resultsSummaryCards" aria-live="polite">
                             <!-- JavaScriptで動的に生成 -->
                         </div>
                     </div>
                     
                     <!-- 資産推移チャート -->
-                    <div class="chart-section">
-                        <header class="chart-header">
+                    <section class="full-width-section">
+                        <div class="full-width-bg"></div>
+                        <div class="inner">
+                            <div class="chart-section">
+                                <header class="chart-header">
                             <h3 class="chart-title">年代別資産推移</h3>
                             <p class="chart-subtitle">あなたの年齢に応じた資産の変化を確認できます</p>
-                        </header>
-                        
-                        <div class="chart-wrapper">
-                            <div id="chartPlaceholder" class="chart-placeholder" tabindex="0">
-                                <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-chart-placeholder"></use></svg>
-                                <div class="placeholder-content">
-                                    <h4>グラフを準備中...</h4>
-                                    <p>シミュレーション結果を計算すると、ここに詳細なグラフが表示されます</p>
+                                </header>
+
+                                <div class="chart-wrapper">
+                                    <div id="chartPlaceholder" class="chart-placeholder" tabindex="0">
+                                        <svg class="placeholder-icon" aria-hidden="true"><use xlink:href="#icon-chart-placeholder"></use></svg>
+                                        <div class="placeholder-content">
+                                            <h4>グラフを準備中...</h4>
+                                            <p>シミュレーション結果を計算すると、ここに詳細なグラフが表示されます</p>
+                                        </div>
+                                    </div>
+                                    <canvas id="lifetimeChart" class="offscreen" aria-label="年代別資産推移グラフ"></canvas>
+                                </div>
+
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color total-assets"></div>
+                                        <span>総資産（現金＋投資）</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color cash-balance"></div>
+                                        <span>現金残高</span>
+                                    </div>
+                                    <div class="legend-item nisa-legend" style="display: none;">
+                                        <div class="legend-color nisa-balance"></div>
+                                        <span>NISA評価額</span>
+                                    </div>
                                 </div>
                             </div>
-                            <canvas id="lifetimeChart" class="offscreen" aria-label="年代別資産推移グラフ"></canvas>
                         </div>
-                        
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <div class="legend-color total-assets"></div>
-                                <span>総資産（現金＋投資）</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color cash-balance"></div>
-                                <span>現金残高</span>
-                            </div>
-                            <div class="legend-item nisa-legend" style="display: none;">
-                                <div class="legend-color nisa-balance"></div>
-                                <span>NISA評価額</span>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
                     
                     <!-- アドバイスセクション -->
                     <div class="advice-section" aria-live="polite">
