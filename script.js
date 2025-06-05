@@ -243,6 +243,147 @@ const StorageManager = {
     }
 };
 
+// ===== クイック診断管理システム =====
+const QuickDiagnosticsManager = {
+    init() {
+        const button = Utils.getElement('quickDiagnosticsButton', false);
+        const ctaButton = Utils.getElement('startDetailedDiagnosticsButton', false);
+
+        if (button) {
+            button.addEventListener('click', this.runDiagnostics.bind(this));
+        }
+        if (ctaButton) {
+            ctaButton.addEventListener('click', this.startDetailedDiagnostics.bind(this));
+        }
+    },
+
+    validateInputs(age, income, occupation) {
+        let isValid = true;
+        UIManager.clearError('quickAge');
+        UIManager.clearError('quickIncome');
+        UIManager.clearError('quickOccupation');
+
+        if (!age || age < 18 || age > 80) {
+            UIManager.showError('quickAge', '18歳から80歳までの年齢を入力してください。');
+            isValid = false;
+        }
+        if (!income && income !== 0) {
+            UIManager.showError('quickIncome', '有効な収入額を入力してください。');
+            isValid = false;
+        }
+        if (!occupation) {
+            UIManager.showError('quickOccupation', '職業を選択してください。');
+            isValid = false;
+        }
+        return isValid;
+    },
+
+    calculate(age, income, occupation) {
+        const PENSION_RETIREMENT_AGE = 65;
+        const LIFE_EXPECTANCY = 95;
+        
+        let pension;
+        switch (occupation) {
+            case 'employee':
+            case 'civil_servant':
+                pension = 15; // 万円/月
+                break;
+            case 'self_employed':
+            case 'part_time':
+            case 'other':
+            default:
+                pension = 6.5; // 万円/月
+                break;
+        }
+        
+        const workingYears = Math.max(0, PENSION_RETIREMENT_AGE - age);
+        const retiredYears = Math.max(0, LIFE_EXPECTANCY - PENSION_RETIREMENT_AGE);
+
+        const totalWorkingIncome = workingYears * (income * 12);
+        const totalPensionIncome = retiredYears * (pension * 12);
+        const totalIncome = totalWorkingIncome + totalPensionIncome;
+
+        const totalYears = Math.max(0, LIFE_EXPECTANCY - age);
+        const totalExpenses = totalYears * (income * 0.7 * 12);
+        
+        const finalAssets = totalIncome - totalExpenses;
+
+        return { finalAssets };
+    },
+
+    getAdvice(finalAssets) {
+        if (finalAssets > 2000) {
+            return '素晴らしいスタートです！詳細診断でさらに盤石な計画を立てましょう。';
+        } else if (finalAssets >= 0) {
+            return '同世代の平均的な水準です。詳細診断で改善点を見つけましょう。';
+        } else if (finalAssets > -1000) {
+            return '少し注意が必要かもしれません。詳細診断で家計の見直しポイントを探りましょう。';
+        } else {
+            return '将来の資金に不安が残ります。今すぐ詳細診断で対策を立てることを強くお勧めします。';
+        }
+    },
+
+    runDiagnostics() {
+        const age = Utils.parseInt(Utils.getElement('quickAge').value, null);
+        const income = Utils.parseNumber(Utils.getElement('quickIncome').value, null);
+        const occupation = Utils.getElement('quickOccupation').value;
+
+        if (!this.validateInputs(age, income, occupation)) {
+            NotificationManager.show('入力内容を確認してください', 'error');
+            return;
+        }
+
+        const result = this.calculate(age, income, occupation);
+        const advice = this.getAdvice(result.finalAssets);
+        
+        const resultTextEl = Utils.getElement('quickResultText');
+        const resultAdviceEl = Utils.getElement('quickResultAdvice');
+        const LIFE_EXPECTANCY = 95;
+        
+        resultTextEl.innerHTML = `あなたの${LIFE_EXPECTANCY}歳時点での推定資産は <strong>${Utils.formatCurrency(result.finalAssets)}</strong> です。`;
+        resultAdviceEl.textContent = advice;
+
+        Utils.getElement('quickDiagnosticsForm').style.display = 'none';
+        Utils.getElement('quickDiagnosticsResult').style.display = 'block';
+    },
+    
+    startDetailedDiagnostics() {
+        const quickDiagnosticsSection = Utils.getElement('quickDiagnostics');
+        const progressSection = Utils.getElement('progress-section');
+        
+        const age = Utils.parseInt(Utils.getElement('quickAge').value, null);
+        const income = Utils.parseNumber(Utils.getElement('quickIncome').value, null);
+        const occupation = Utils.getElement('quickOccupation').value;
+
+        if (age && (income || income === 0) && occupation) {
+            const birthYear = new Date().getFullYear() - age;
+            const birthMonth = new Date().getMonth() + 1;
+            Utils.getElement('birthYear').value = birthYear;
+            Utils.getElement('birthMonth').value = birthMonth;
+            appState.basicInfo.birthday = new Date(birthYear, birthMonth - 1, 1).toISOString().split('T')[0];
+            FormManager.updateAgeDisplay();
+
+            Utils.getElement('income').value = income;
+            appState.basicInfo.income = income;
+            Utils.getElement('occupation').value = occupation;
+            appState.basicInfo.occupation = occupation;
+            
+            FormManager.autoSave();
+        }
+
+        quickDiagnosticsSection.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        quickDiagnosticsSection.style.opacity = '0';
+        quickDiagnosticsSection.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            quickDiagnosticsSection.style.display = 'none';
+            if (progressSection) {
+                Utils.scrollToElement(progressSection, 20);
+            }
+        }, 500);
+    }
+};
+
 
 // ===== UI管理システム =====
 const UIManager = {
@@ -913,6 +1054,7 @@ const AppInitializer = {
     init() {
         this.loadData();
         this.setupUI();
+        QuickDiagnosticsManager.init();
         this.setupEventListeners();
         UIManager.showQuickGuide();
     },

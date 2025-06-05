@@ -270,6 +270,91 @@ body {
     font-size: var(--text-base);
 }
 
+/* ===== クイック診断セクション ===== */
+.quick-diagnostics-section {
+    background: linear-gradient(135deg, var(--color-primary-50), var(--color-primary-100));
+    border: 2px solid var(--color-primary-200);
+    margin-bottom: var(--space-16);
+    text-align: center;
+}
+
+.quick-diagnostics-header {
+    margin-bottom: var(--space-8);
+}
+
+.quick-diagnostics-title {
+    font-size: var(--text-3xl);
+    color: var(--color-primary-700);
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+}
+
+.quick-diagnostics-icon {
+    font-size: 1.2em;
+}
+
+.quick-diagnostics-description {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: var(--leading-relaxed);
+}
+
+.quick-diagnostics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+    text-align: left;
+}
+
+.quick-diagnostics-actions {
+    margin-top: var(--space-8);
+}
+
+.quick-diagnostics-result {
+    padding: var(--space-8);
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    margin-top: var(--space-8);
+    border: 1px solid var(--color-border);
+    animation: fadeInUp 0.5s ease;
+}
+
+.quick-diagnostics-result .result-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-primary-700);
+    margin-bottom: var(--space-4);
+}
+
+.quick-diagnostics-result .result-text {
+    font-size: var(--text-lg);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-relaxed);
+}
+
+.quick-diagnostics-result .result-text strong {
+    font-size: 1.2em;
+    font-weight: var(--font-bold);
+}
+
+.quick-diagnostics-result .result-advice {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    background-color: var(--color-secondary-50);
+    border-radius: var(--radius-lg);
+}
+
+
 /* ===== 大きなステップ表示 ===== */
 .main-step-tracker {
     display: flex;
@@ -2471,6 +2556,13 @@ select.form-control {
         gap: var(--space-4);
     }
 
+    .quick-diagnostics-title {
+        font-size: var(--text-2xl);
+    }
+    .quick-diagnostics-grid {
+        grid-template-columns: 1fr;
+    }
+
     .progress-steps {
         grid-template-columns: 1fr;
         gap: var(--space-3);
@@ -2708,7 +2800,8 @@ select.form-control {
 @media print {
     .step-navigation,
     .loading,
-    .personality-section {
+    .personality-section,
+    .quick-diagnostics-section {
         display: none !important;
     }
     
