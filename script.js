@@ -874,7 +874,7 @@ const Utils = {
 
     // 安全な整数解析
     parseInt(value, defaultValue = 0, min = -Infinity, max = Infinity) {
-        const num = parseInt(value);
+        const num = Number.parseInt(value, 10);
         if (isNaN(num)) return defaultValue;
         return Math.max(min, Math.min(max, num));
     },
