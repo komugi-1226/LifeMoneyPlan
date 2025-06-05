@@ -619,6 +619,155 @@ body {
     line-height: var(--leading-relaxed);
 }
 
+/* ===== 価値観診断セクション ===== */
+.personality-section {
+    background: var(--color-primary-50);
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-10);
+    position: relative;
+    overflow: hidden;
+}
+
+.personality-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary-400), var(--color-primary-600), var(--color-primary-400));
+}
+
+.personality-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.personality-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-primary-700);
+    margin-bottom: var(--space-4);
+}
+
+.personality-icon {
+    font-size: 1.3em;
+}
+
+.personality-description {
+    font-size: var(--text-base);
+    color: var(--color-primary-600);
+    line-height: var(--leading-relaxed);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.personality-question {
+    margin-top: var(--space-6);
+}
+
+.question-text {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--space-8);
+    line-height: var(--leading-normal);
+}
+
+.personality-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+.personality-option {
+    cursor: pointer;
+    position: relative;
+    display: block;
+}
+
+.personality-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.option-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+    min-height: 120px;
+    position: relative;
+}
+
+.option-content:hover {
+    border-color: var(--color-primary-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-base);
+}
+
+.personality-radio:checked + .option-content {
+    border-color: var(--color-primary-500);
+    background: var(--color-primary-50);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.personality-radio:checked + .option-content::before {
+    content: '✓';
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary-500);
+    color: white;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+}
+
+.option-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    margin-top: var(--space-1);
+}
+
+.option-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.option-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-tight);
+}
+
+.option-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+}
+
 /* ===== フォームスタイル ===== */
 .form-section {
     margin-bottom: var(--space-10);
@@ -2425,6 +2574,29 @@ select.form-control {
         grid-template-columns: 1fr;
         gap: var(--space-8);
     }
+
+    /* 価値観診断セクションのモバイル対応 */
+    .personality-options {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+    }
+
+    .option-content {
+        min-height: auto;
+        padding: var(--space-4);
+    }
+
+    .option-icon {
+        font-size: 2rem;
+    }
+
+    .option-title {
+        font-size: var(--text-base);
+    }
+
+    .option-description {
+        font-size: var(--text-xs);
+    }
 }
 
 @media (max-width: 480px) {
@@ -2479,13 +2651,55 @@ select.form-control {
     .quick-guide-content {
         width: 90%;
     }
+
+    /* 価値観診断セクションの小画面対応 */
+    .personality-section {
+        padding: var(--space-4);
+        margin-bottom: var(--space-8);
+    }
+
+    .personality-title {
+        font-size: var(--text-xl);
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .question-text {
+        font-size: var(--text-base);
+        margin-bottom: var(--space-6);
+    }
+
+    .option-content {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--space-3);
+    }
+
+    .option-icon {
+        font-size: 1.8rem;
+        margin-bottom: var(--space-2);
+    }
+
+    .option-text {
+        text-align: center;
+    }
+
+    .option-title {
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-1);
+    }
+
+    .option-description {
+        font-size: var(--text-xs);
+    }
 }
 
 /* ===== フォーカス管理 ===== */
 .btn:focus-visible,
 .form-control:focus-visible,
 .step-label:focus-visible,
-.tooltip-trigger:focus-visible {
+.tooltip-trigger:focus-visible,
+.personality-radio:focus-visible + .option-content {
     outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
@@ -2493,7 +2707,8 @@ select.form-control {
 /* ===== 印刷スタイル ===== */
 @media print {
     .step-navigation,
-    .loading {
+    .loading,
+    .personality-section {
         display: none !important;
     }
     
@@ -2547,5 +2762,9 @@ select.form-control {
     
     .form-control {
         border-width: 3px;
+    }
+
+    .personality-radio:checked + .option-content {
+        border-width: 4px;
     }
 }

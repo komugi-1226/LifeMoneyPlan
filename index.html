@@ -163,6 +163,71 @@
                         年金額やシミュレーション期間を計算するために必要な基本情報を入力します
                     </p>
                 </header>
+
+                <!-- 価値観診断セクション -->
+                <section class="personality-section" aria-labelledby="personality-title">
+                    <header class="personality-header">
+                        <h3 id="personality-title" class="personality-title">
+                            <span class="personality-icon" aria-hidden="true">💭</span>
+                            あなたの価値観診断
+                        </h3>
+                        <p class="personality-description">
+                            より良いアドバイスを提供するため、まずはあなたの価値観をお聞かせください
+                        </p>
+                    </header>
+                    
+                    <div class="personality-question">
+                        <h4 class="question-text">あなたにとって、お金を使う上で最も大切なことは何ですか？</h4>
+                        
+                        <div class="personality-options" role="radiogroup" aria-labelledby="personality-title">
+                            <label class="personality-option">
+                                <input type="radio" name="financialPersonality" value="security" class="personality-radio" aria-describedby="security-desc">
+                                <div class="option-content">
+                                    <div class="option-icon">🛡️</div>
+                                    <div class="option-text">
+                                        <div class="option-title">将来のための着実な貯蓄と安定</div>
+                                        <div class="option-description" id="security-desc">リスクを避け、確実に資産を積み上げたい</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="personality-option">
+                                <input type="radio" name="financialPersonality" value="growth" class="personality-radio" aria-describedby="growth-desc">
+                                <div class="option-content">
+                                    <div class="option-icon">📈</div>
+                                    <div class="option-text">
+                                        <div class="option-title">スキルアップやキャリアのための自己投資</div>
+                                        <div class="option-description" id="growth-desc">将来の収入増を目指して自分に投資したい</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="personality-option">
+                                <input type="radio" name="financialPersonality" value="freedom" class="personality-radio" aria-describedby="freedom-desc">
+                                <div class="option-content">
+                                    <div class="option-icon">✨</div>
+                                    <div class="option-text">
+                                        <div class="option-title">旅行や趣味など、今を楽しむための体験</div>
+                                        <div class="option-description" id="freedom-desc">人生は一度きり、今の楽しみを大切にしたい</div>
+                                    </div>
+                                </div>
+                            </label>
+                            
+                            <label class="personality-option">
+                                <input type="radio" name="financialPersonality" value="contribution" class="personality-radio" aria-describedby="contribution-desc">
+                                <div class="option-content">
+                                    <div class="option-icon">❤️</div>
+                                    <div class="option-text">
+                                        <div class="option-title">家族との時間や大切な人への贈り物</div>
+                                        <div class="option-description" id="contribution-desc">大切な人との関係を深めることを重視したい</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div id="financialPersonalityError" class="input-error-message" role="alert" style="display:none;"></div>
+                    </div>
+                </section>
                 
                 <div class="form-section">
                     <fieldset class="form-fieldset">
