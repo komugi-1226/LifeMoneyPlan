@@ -1434,6 +1434,24 @@ const UIManager = {
             if (adviceContent) adviceContent.style.display = 'none';
         }
     },
+
+    // 入力検証状況を更新
+    showValidationStatus() {
+        const errors = StepValidator.validateStep(1);
+        const fields = [
+            'birthDate', 'income', 'occupation',
+            'nationalPension実績Years', 'nationalPension予定Years',
+            'employeePension実績Years', 'employeePension予定Years',
+            'nationalPensionTotal', 'employeePensionTotal'
+        ];
+        fields.forEach(id => {
+            if (errors.has(id)) {
+                this.showError(id, errors.get(id));
+            } else {
+                this.clearError(id);
+            }
+        });
+    },
     // クイックガイド表示
     showQuickGuide() {
         const overlay = Utils.getElement("quickGuideOverlay", false);
@@ -3515,6 +3533,30 @@ const AppInitializer = {
                 FormManager.autoSave();
             });
         }
+
+        // ==== リアルタイム検証の追加 ====
+        const validateRealTime = () => {
+            Utils.debounce('realtimeValidation', () => {
+                UIManager.showValidationStatus();
+            }, 500);
+        };
+
+        ['birthYear', 'birthMonth', 'income', 'occupation'].forEach(fieldId => {
+            const element = Utils.getElement(fieldId, false);
+            if (element) {
+                element.addEventListener('change', validateRealTime);
+                element.addEventListener('input', validateRealTime);
+            }
+        });
+
+        ['nationalPension実績Years', 'nationalPension予定Years',
+         'employeePension実績Years', 'employeePension予定Years'].forEach(fieldId => {
+            const element = Utils.getElement(fieldId, false);
+            if (element) {
+                element.addEventListener('change', validateRealTime);
+                element.addEventListener('input', validateRealTime);
+            }
+        });
     },
 
     setupNavigationListeners() {
