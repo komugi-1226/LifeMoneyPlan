@@ -3355,3 +3355,33 @@ select.form-control {
         font-weight: bold;
     }
 }
+/* ===== Validation Status Styles ===== */
+.validation-status {
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.status-good {
+    background: #ecfdf5;
+    border: 2px solid #10b981;
+    color: #047857;
+    font-weight: 600;
+}
+
+.status-error {
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    color: #dc2626;
+}
+
+.status-error ul {
+    margin: 0.5rem 0 0 1rem;
+    padding: 0;
+}
+
+.status-error li {
+    margin-bottom: 0.5rem;
+}
