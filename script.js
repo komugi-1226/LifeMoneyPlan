@@ -1434,6 +1434,41 @@ const UIManager = {
             if (adviceContent) adviceContent.style.display = 'none';
         }
     },
+
+    // ステップ1の入力状況を表示
+    showValidationStatus() {
+        const statusElement = document.getElementById('validationStatus') || (() => {
+            const el = document.createElement('div');
+            el.id = 'validationStatus';
+            el.className = 'validation-status';
+            const container = document.querySelector('#step1 .card');
+            if (container) {
+                container.appendChild(el);
+            }
+            return el;
+        })();
+
+        const errors = StepValidator.validateStep(1);
+
+        if (errors.size === 0) {
+            statusElement.innerHTML = `
+                <div class="status-good">
+                    ✅ すべての入力が完了しています。次のステップに進めます。
+                </div>
+            `;
+        } else {
+            const errorList = Array.from(errors.entries())
+                .map(([field, message]) => `<li><strong>${field}:</strong> ${message}</li>`)
+                .join('');
+
+            statusElement.innerHTML = `
+                <div class="status-error">
+                    ⚠️ 以下の項目を確認してください：
+                    <ul>${errorList}</ul>
+                </div>
+            `;
+        }
+    },
     // クイックガイド表示
     showQuickGuide() {
         const overlay = Utils.getElement("quickGuideOverlay", false);
@@ -1629,6 +1664,9 @@ const FormManager = {
     autoSave() {
         Utils.debounce('autoSave', () => {
             StorageManager.save(appState);
+            if (appState.currentStep === 1) {
+                UIManager.showValidationStatus();
+            }
         }, 500);
     },
 
