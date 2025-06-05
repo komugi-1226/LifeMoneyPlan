@@ -797,12 +797,22 @@ const Utils = {
 
     // 安全なDOM要素取得
     getElement(id, required = true) {
-        const element = document.getElementById(id);
-        if (!element && required) {
-            console.error(`Required element not found: ${id}`);
+        try {
+            const element = document.getElementById(id);
+            if (!element && required) {
+                console.error(`Required element not found: ${id}`);
+                // フォールバック処理を追加
+                const fallback = document.createElement('div');
+                fallback.id = id;
+                fallback.style.display = 'none';
+                document.body.appendChild(fallback);
+                return fallback;
+            }
+            return element;
+        } catch (error) {
+            console.error(`Error accessing element ${id}:`, error);
             return null;
         }
-        return element;
     },
 
     // 安全な数値解析
