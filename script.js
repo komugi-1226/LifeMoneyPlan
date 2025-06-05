@@ -357,8 +357,8 @@ class PremiumUXManager {
     }
 }
 
-// プレミアムUXマネージャーの初期化
-const premiumUX = new PremiumUXManager();
+// プレミアムUXマネージャーの初期化（Node環境ではスキップ）
+const premiumUX = (typeof document !== 'undefined') ? new PremiumUXManager() : null;
 
 // ===== 基本的なナビゲーション関数 =====
 
@@ -757,22 +757,26 @@ function resetApp() {
     }
 }
 
-// エラーハンドリングの改善
-window.addEventListener('error', (event) => {
-    console.error('Global Error:', event.error);
-    premiumUX.handleError(event.error, 'global');
-});
+// エラーハンドリングの改善（ブラウザ環境のみ）
+if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+        console.error('Global Error:', event.error);
+        if (premiumUX) premiumUX.handleError(event.error, 'global');
+    });
 
-// 未処理のPromise拒否をキャッチ
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled Promise Rejection:', event.reason);
-    premiumUX.handleError(event.reason, 'unhandledPromise');
-});
+    // 未処理のPromise拒否をキャッチ
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled Promise Rejection:', event.reason);
+        if (premiumUX) premiumUX.handleError(event.reason, 'unhandledPromise');
+    });
+}
 
 // ページ読み込み完了時にアプリを初期化
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
-});
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeApp();
+    });
+}
 
 // グローバル変数
 let lifetimeChart = null;
@@ -4236,6 +4240,7 @@ if (typeof window !== 'undefined') {
 }
 
 // ===== アプリケーション開始 =====
+if (typeof document !== 'undefined') {
 document.addEventListener('DOMContentLoaded', function() {
     // Chart.jsの読み込みを確認
     const maxAttempts = 20; // 2秒間等待
@@ -4262,6 +4267,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     checkChartJS();
 });
+}
 
 // エクスポート（モジュール使用時）
 if (typeof module !== 'undefined' && module.exports) {
