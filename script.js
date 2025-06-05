@@ -2722,7 +2722,23 @@ const StepValidator = {
             }
         }
 
+        this.updateStatus(errors);
         return errors.size;
+    },
+
+    updateStatus(errors) {
+        const statusEl = Utils.getElement('validationStatus', false);
+        if (!statusEl) return;
+
+        if (errors.size === 0) {
+            statusEl.textContent = '入力は問題ありません';
+            statusEl.classList.remove('error');
+            statusEl.classList.add('success');
+        } else {
+            statusEl.textContent = `入力エラーが${errors.size}件あります`;
+            statusEl.classList.remove('success');
+            statusEl.classList.add('error');
+        }
     }
 };
 

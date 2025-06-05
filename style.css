@@ -1012,6 +1012,21 @@ select.form-control {
     font-size: var(--text-base);
 }
 
+/* ===== バリデーションステータス表示 ===== */
+.validation-status {
+    text-align: center;
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+}
+
+.validation-status.success {
+    color: var(--color-success-600);
+}
+
+.validation-status.error {
+    color: var(--color-error-600);
+}
+
 /* ===== ツールチップ ===== */
 .tooltip-trigger {
     background: none;
