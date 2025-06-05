@@ -1989,6 +1989,11 @@ select.form-control {
     left: 100%;
 }
 
+.btn--primary:disabled {
+    background: #d3d3d3;
+    color: #ffffff;
+}
+
 .btn--secondary {
     background: var(--color-surface);
     color: var(--color-text-primary);
