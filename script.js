@@ -1439,54 +1439,7 @@ const UIManager = {
         }
     },
 
-    // 入力検証状況を更新
-    showValidationStatus() {
-        const statusElement = (typeof document !== 'undefined') ?
-            document.getElementById('validationStatus') || (() => {
-                const el = document.createElement('div');
-                el.id = 'validationStatus';
-                el.className = 'validation-status';
-                const container = document.querySelector('#step1 .card');
-                if (container) container.appendChild(el);
-                return el;
-            })() : null;
 
-        // Step1 の検証ルールを走らせる
-        const errors = StepValidator.validateStep(1);
-
-        // エラーがあるフィールドを１つずつ赤く表示 or 消す
-        const fields = [
-            'birthDate', 'income', 'occupation',
-            'nationalPension実績Years', 'nationalPension予定Years',
-            'employeePension実績Years', 'employeePension予定Years',
-            'nationalPensionTotal', 'employeePensionTotal'
-        ];
-        fields.forEach(id => {
-            if (errors.has(id)) {
-                this.showError(id, errors.get(id));
-            } else {
-                this.clearError(id);
-            }
-        });
-
-        if (!statusElement) return;
-
-        if (errors.size === 0) {
-            statusElement.innerHTML = `
-                <div class="status-good">
-                    ✅ すべての入力が完了しています。次のステップに進めます。
-                </div>`;
-        } else {
-            const errorList = Array.from(errors.entries())
-                .map(([field, message]) => `<li><strong>${field}:</strong> ${message}</li>`) 
-                .join('');
-            statusElement.innerHTML = `
-                <div class="status-error">
-                    ⚠️ 以下の項目を確認してください：
-                    <ul>${errorList}</ul>
-                </div>`;
-        }
-    },
     // クイックガイド表示
     showQuickGuide() {
         const overlay = Utils.getElement("quickGuideOverlay", false);
@@ -1682,6 +1635,9 @@ const FormManager = {
     autoSave() {
         Utils.debounce('autoSave', () => {
             StorageManager.save(appState);
+            if (appState.currentStep === 1) {
+                UIManager.showValidationStatus();
+            }
         }, 500);
     },
 
@@ -2737,7 +2693,23 @@ const StepValidator = {
             }
         }
 
+        this.updateStatus(errors);
         return errors.size;
+    },
+
+    updateStatus(errors) {
+        const statusEl = Utils.getElement('validationStatus', false);
+        if (!statusEl) return;
+
+        if (errors.size === 0) {
+            statusEl.textContent = '入力は問題ありません';
+            statusEl.classList.remove('error');
+            statusEl.classList.add('success');
+        } else {
+            statusEl.textContent = `入力エラーが${errors.size}件あります`;
+            statusEl.classList.remove('success');
+            statusEl.classList.add('error');
+        }
     }
 };
 
@@ -3458,7 +3430,10 @@ const AppInitializer = {
     },
     async init() {
         try {
-            console.log('アプリケーション初期化開始');
+            // ここではアプリを準備します。難しい言葉は置いておいて、
+            // ざっくり「必要なデータを読み込み、画面を設定し、
+            // 最後にちゃんと動いているか確認する」と覚えておいてください。
+            console.log('🚀 アプリケーション初期化開始');
             if (!this.checkBrowserSupport()) {
                 console.warn("Unsupported browser features detected");
             }
@@ -3480,10 +3455,28 @@ const AppInitializer = {
             
             // 初期表示更新
             this.updateInitialDisplay();
-            
+
+            // デバッグ情報の出力（少し待ってから実行）
+            // 1秒後にアプリの状態や画面がきちんと準備できているかを表示します
+            setTimeout(() => {
+                console.log('📊 初期化完了後の状態:');
+                console.log('- appState:', appState);
+                console.log('- DOM elements check:', {
+                    birthYear: !!document.getElementById('birthYear'),
+                    income: !!document.getElementById('income'),
+                    occupation: !!document.getElementById('occupation')
+                });
+
+                // もしUIManager.showValidationStatusがあれば初回バリデーションを実行
+                if (typeof UIManager.showValidationStatus === 'function') {
+                    UIManager.showValidationStatus();
+                }
+            }, 1000);
+
             console.log('アプリケーション初期化完了');
             
         } catch (error) {
+            console.error('❌ 初期化エラー:', error);
             Utils.handleError(error, 'Application initialization');
         }
     },
