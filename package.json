@@ -4,13 +4,11 @@
   "description": "",
   "main": "perfMonitor.js",
   "scripts": {
-    "test": "playwright test"
+    "test": "node tests/runTests.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "devDependencies": {
-    "@playwright/test": "^1.42.1"
-  }
+  "devDependencies": {}
 }

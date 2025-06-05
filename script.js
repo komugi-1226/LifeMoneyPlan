@@ -357,8 +357,8 @@ class PremiumUXManager {
     }
 }
 
-// プレミアムUXマネージャーの初期化
-const premiumUX = new PremiumUXManager();
+// プレミアムUXマネージャーの初期化（Node環境ではスキップ）
+const premiumUX = (typeof document !== 'undefined') ? new PremiumUXManager() : null;
 
 // ===== 基本的なナビゲーション関数 =====
 
@@ -757,22 +757,26 @@ function resetApp() {
     }
 }
 
-// エラーハンドリングの改善
-window.addEventListener('error', (event) => {
-    console.error('Global Error:', event.error);
-    premiumUX.handleError(event.error, 'global');
-});
+// エラーハンドリングの改善（ブラウザ環境のみ）
+if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+        console.error('Global Error:', event.error);
+        if (premiumUX) premiumUX.handleError(event.error, 'global');
+    });
 
-// 未処理のPromise拒否をキャッチ
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled Promise Rejection:', event.reason);
-    premiumUX.handleError(event.reason, 'unhandledPromise');
-});
+    // 未処理のPromise拒否をキャッチ
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled Promise Rejection:', event.reason);
+        if (premiumUX) premiumUX.handleError(event.reason, 'unhandledPromise');
+    });
+}
 
 // ページ読み込み完了時にアプリを初期化
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
-});
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeApp();
+    });
+}
 
 // グローバル変数
 let lifetimeChart = null;
@@ -1435,40 +1439,7 @@ const UIManager = {
         }
     },
 
-    // ステップ1の入力状況を表示
-    showValidationStatus() {
-        const statusElement = document.getElementById('validationStatus') || (() => {
-            const el = document.createElement('div');
-            el.id = 'validationStatus';
-            el.className = 'validation-status';
-            const container = document.querySelector('#step1 .card');
-            if (container) {
-                container.appendChild(el);
-            }
-            return el;
-        })();
 
-        const errors = StepValidator.validateStep(1);
-
-        if (errors.size === 0) {
-            statusElement.innerHTML = `
-                <div class="status-good">
-                    ✅ すべての入力が完了しています。次のステップに進めます。
-                </div>
-            `;
-        } else {
-            const errorList = Array.from(errors.entries())
-                .map(([field, message]) => `<li><strong>${field}:</strong> ${message}</li>`)
-                .join('');
-
-            statusElement.innerHTML = `
-                <div class="status-error">
-                    ⚠️ 以下の項目を確認してください：
-                    <ul>${errorList}</ul>
-                </div>
-            `;
-        }
-    },
     // クイックガイド表示
     showQuickGuide() {
         const overlay = Utils.getElement("quickGuideOverlay", false);
@@ -3590,6 +3561,30 @@ const AppInitializer = {
                 FormManager.autoSave();
             });
         }
+
+        // ==== リアルタイム検証の追加 ====
+        const validateRealTime = () => {
+            Utils.debounce('realtimeValidation', () => {
+                UIManager.showValidationStatus();
+            }, 500);
+        };
+
+        ['birthYear', 'birthMonth', 'income', 'occupation'].forEach(fieldId => {
+            const element = Utils.getElement(fieldId, false);
+            if (element) {
+                element.addEventListener('change', validateRealTime);
+                element.addEventListener('input', validateRealTime);
+            }
+        });
+
+        ['nationalPension実績Years', 'nationalPension予定Years',
+         'employeePension実績Years', 'employeePension予定Years'].forEach(fieldId => {
+            const element = Utils.getElement(fieldId, false);
+            if (element) {
+                element.addEventListener('change', validateRealTime);
+                element.addEventListener('input', validateRealTime);
+            }
+        });
     },
 
     setupNavigationListeners() {
@@ -4269,6 +4264,7 @@ if (typeof window !== 'undefined') {
 }
 
 // ===== アプリケーション開始 =====
+if (typeof document !== 'undefined') {
 document.addEventListener('DOMContentLoaded', function() {
     // Chart.jsの読み込みを確認
     const maxAttempts = 20; // 2秒間等待
@@ -4295,6 +4291,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     checkChartJS();
 });
+}
 
 // エクスポート（モジュール使用時）
 if (typeof module !== 'undefined' && module.exports) {
