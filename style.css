@@ -214,10 +214,44 @@ body::before {
 
 /* ===== レイアウト ===== */
 .container {
-    max-width: 900px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: var(--space-6);
+    padding: 0 40px;
     position: relative;
+}
+
+.hero {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+.hero .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.full-width-section {
+    position: relative;
+}
+
+.full-width-section .full-width-bg {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.full-width-section .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
 }
 
 /* ===== ヘッダー ===== */
@@ -2230,6 +2264,37 @@ select.form-control {
     box-shadow: var(--shadow-lg);
 }
 
+/* ===== 汎用カードレイアウト ===== */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 40px;
+}
+
+@media (max-width: 600px) {
+    .cards {
+        padding: 0 20px;
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    .cards {
+        padding: 0 30px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .cards {
+        padding: 0 40px;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 .result-icon {
     font-size: 3rem;
     margin-bottom: var(--space-4);
@@ -2784,9 +2849,9 @@ select.form-control {
 }
 
 /* ===== レスポンシブデザイン ===== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .container {
-        padding: var(--space-4);
+        padding: 0 30px;
     }
 
     .header {
@@ -2937,9 +3002,9 @@ select.form-control {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .container {
-        padding: var(--space-3);
+        padding: 0 20px;
     }
 
     .header-title {
