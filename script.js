@@ -1441,7 +1441,19 @@ const UIManager = {
 
     // 入力検証状況を更新
     showValidationStatus() {
+        const statusElement = (typeof document !== 'undefined') ?
+            document.getElementById('validationStatus') || (() => {
+                const el = document.createElement('div');
+                el.id = 'validationStatus';
+                el.className = 'validation-status';
+                const container = document.querySelector('#step1 .card');
+                if (container) container.appendChild(el);
+                return el;
+            })() : null;
+
         const errors = StepValidator.validateStep(1);
+
+        // フィールドごとのエラーメッセージ表示
         const fields = [
             'birthDate', 'income', 'occupation',
             'nationalPension実績Years', 'nationalPension予定Years',
@@ -1455,6 +1467,24 @@ const UIManager = {
                 this.clearError(id);
             }
         });
+
+        if (!statusElement) return;
+
+        if (errors.size === 0) {
+            statusElement.innerHTML = `
+                <div class="status-good">
+                    ✅ すべての入力が完了しています。次のステップに進めます。
+                </div>`;
+        } else {
+            const errorList = Array.from(errors.entries())
+                .map(([field, message]) => `<li><strong>${field}:</strong> ${message}</li>`) 
+                .join('');
+            statusElement.innerHTML = `
+                <div class="status-error">
+                    ⚠️ 以下の項目を確認してください：
+                    <ul>${errorList}</ul>
+                </div>`;
+        }
     },
     // クイックガイド表示
     showQuickGuide() {
