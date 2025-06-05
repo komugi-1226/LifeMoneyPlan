@@ -1031,6 +1031,16 @@ const NotificationManager = {
 // ===== フォーム検証システム =====
 const ValidationManager = {
     rules: new Map(),
+    notifyOnError: false,
+
+    updateNextButtonState() {
+        const errors = StepValidator.validateStep(appState.currentStep);
+        const section = document.getElementById(`step${appState.currentStep}`);
+        const nextBtn = section?.querySelector('.step-navigation .btn--primary.btn--large');
+        if (nextBtn) {
+            nextBtn.disabled = errors.size > 0;
+        }
+    },
     
     addRule(fieldId, validator, message) {
         if (!this.rules.has(fieldId)) {
@@ -1045,6 +1055,10 @@ const ValidationManager = {
 
         for (const rule of fieldRules) {
             if (!rule.validator(value)) {
+                if (this.notifyOnError) {
+                    console.error(`Validation failed for ${fieldId}: ${rule.message}`);
+                    premiumUX.showNotification('error', '入力エラー', rule.message);
+                }
                 return {
                     isValid: false,
                     message: rule.message
@@ -2745,7 +2759,9 @@ const StepValidator = {
 // ===== ナビゲーション管理システム =====
 const NavigationManager = {
     nextStep() {
+        ValidationManager.notifyOnError = true;
         const errors = StepValidator.validateStep(appState.currentStep);
+        ValidationManager.notifyOnError = false;
         const errorCount = StepValidator.showValidationErrors(errors);
         if (errorCount > 0) {
             // デバッグ情報を詳細表示
@@ -2772,6 +2788,7 @@ const NavigationManager = {
             appState.farthestValidatedStep = Math.max(appState.farthestValidatedStep, appState.currentStep);
             UIManager.showStep(appState.currentStep);
             NotificationManager.show('次のステップに進みました', 'success', 2000);
+            ValidationManager.updateNextButtonState();
         }
     },
 
@@ -3717,6 +3734,10 @@ const AppInitializer = {
             Utils.handleError(e.reason, 'Unhandled promise rejection');
         });
 
+        // 入力内容変更時に次へボタンを更新
+        document.addEventListener('input', () => ValidationManager.updateNextButtonState());
+        document.addEventListener('change', () => ValidationManager.updateNextButtonState());
+
         // インラインヘルプ表示
         document.querySelectorAll('.help-icon').forEach(icon => {
             const tooltip = document.getElementById('tooltip-' + icon.id.replace('help-', ''));
@@ -3744,6 +3765,9 @@ const AppInitializer = {
         UIManager.showQuickGuide();
         // ライフイベント詳細設定の可視性更新
         LifeEventManager.updateDetailSettingsVisibility();
+
+        // 初期表示時に次へボタンの状態を設定
+        ValidationManager.updateNextButtonState();
     },
 
     resetApplication() {
