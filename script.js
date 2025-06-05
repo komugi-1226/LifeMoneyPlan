@@ -362,57 +362,6 @@ const premiumUX = new PremiumUXManager();
 
 // ===== 基本的なナビゲーション関数 =====
 
-// 次のステップに進む
-function nextStep() {
-    if (appState.currentStep < 5) {
-        // 現在のステップを非表示
-        const currentSection = document.getElementById(`step${appState.currentStep}`);
-        if (currentSection) {
-            currentSection.classList.remove('active');
-        }
-        
-        // 次のステップを表示
-        appState.currentStep++;
-        const nextSection = document.getElementById(`step${appState.currentStep}`);
-        if (nextSection) {
-            nextSection.classList.add('active');
-        }
-        
-        // プログレスバーを更新
-        updateProgressBar();
-        
-        // プレミアムUX通知
-        premiumUX.showNotification('success', 'ステップ完了', 
-            `ステップ${appState.currentStep-1}が完了しました。次に進みます。`);
-        
-        // ページトップにスクロール
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-}
-
-// 前のステップに戻る
-function prevStep() {
-    if (appState.currentStep > 1) {
-        // 現在のステップを非表示
-        const currentSection = document.getElementById(`step${appState.currentStep}`);
-        if (currentSection) {
-            currentSection.classList.remove('active');
-        }
-        
-        // 前のステップを表示
-        appState.currentStep--;
-        const prevSection = document.getElementById(`step${appState.currentStep}`);
-        if (prevSection) {
-            prevSection.classList.add('active');
-        }
-        
-        // プログレスバーを更新
-        updateProgressBar();
-        
-        // ページトップにスクロール
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-}
 
 // プログレスバーの更新
 function updateProgressBar() {
@@ -545,7 +494,7 @@ function calculateResults() {
                 loading.setAttribute('aria-hidden', 'true');
             }
 
-            nextStep();
+            NavigationManager.nextStep();
             ResultsManager.render();
 
             premiumUX.showNotification('success', '計算完了',
@@ -2734,6 +2683,8 @@ const StepValidator = {
                 }, 300);
             }
         }
+
+        return errors.size;
     }
 };
 
@@ -2741,10 +2692,16 @@ const StepValidator = {
 const NavigationManager = {
     nextStep() {
         const errors = StepValidator.validateStep(appState.currentStep);
-        
-        if (errors.size > 0) {
-            StepValidator.showValidationErrors(errors);
-            NotificationManager.show('入力内容を確認してください', 'error');
+        const errorCount = StepValidator.showValidationErrors(errors);
+        if (errorCount > 0) {
+            NotificationManager.show('入力を確認してね！', 'error');
+            console.warn(errors);
+            const currentSection = Utils.getElement(`step${appState.currentStep}`, false);
+            const nextBtn = currentSection?.querySelector('.step-navigation .btn--primary.btn--large');
+            if (nextBtn) {
+                nextBtn.classList.add('btn--shake');
+                setTimeout(() => nextBtn.classList.remove('btn--shake'), 300);
+            }
             return;
         }
 
