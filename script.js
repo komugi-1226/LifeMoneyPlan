@@ -1451,9 +1451,10 @@ const UIManager = {
                 return el;
             })() : null;
 
+        // Step1 の検証ルールを走らせる
         const errors = StepValidator.validateStep(1);
 
-        // フィールドごとのエラーメッセージ表示
+        // エラーがあるフィールドを１つずつ赤く表示 or 消す
         const fields = [
             'birthDate', 'income', 'occupation',
             'nationalPension実績Years', 'nationalPension予定Years',
