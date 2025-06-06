@@ -378,12 +378,29 @@
         }
 
         /* ===== パーソナル・ダッシュボード (ここから追加) ===== */
+        /* プレミアムダッシュボード */
         #personalDashboard {
             margin-bottom: var(--space-16);
-            border: 2px solid var(--color-primary-300);
-            background: linear-gradient(135deg, var(--color-primary-50), var(--color-primary-100));
-            animation: fadeInUp 0.5s ease-out;
-            padding: var(--space-10);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: var(--radius-3xl);
+            box-shadow: var(--shadow-floating);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: var(--space-12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #personalDashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-wealth);
+            animation: shimmer 3s ease-in-out infinite;
         }
 
         .dashboard-header {
@@ -437,10 +454,107 @@
             color: var(--color-primary-600);
             line-height: var(--leading-tight);
         }
-        
-        #dashboardRating {
-             font-size: 2rem;
-             padding: 1rem 1.5rem;
+
+        /* 新しいダッシュボード要素 */
+        .title-badge {
+            background: var(--gradient-premium);
+            color: var(--color-text-primary);
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-xl);
+            display: inline-block;
+            box-shadow: var(--shadow-premium);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .health-score {
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-black);
+            background: var(--gradient-success);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            font-weight: var(--font-medium);
+            display: block;
+            margin-top: var(--space-1);
+        }
+
+        .breakdown-prob {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--color-error-500);
+            text-align: center;
+            padding: var(--space-3);
+            background: var(--color-error-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-error-200);
+        }
+
+        .breakdown-prob.low-risk {
+            color: var(--color-success-600);
+            background: var(--color-success-50);
+            border-color: var(--color-success-200);
+        }
+
+        .breakdown-prob.medium-risk {
+            color: var(--color-warning-600);
+            background: var(--color-warning-50);
+            border-color: var(--color-warning-200);
+        }
+
+        .summary-date {
+            font-size: var(--text-base);
+            color: var(--color-text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .reminder-section {
+            margin-top: var(--space-8);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .reminder-card {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+            padding: var(--space-6);
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .reminder-icon {
+            font-size: var(--text-2xl);
+            flex-shrink: 0;
+        }
+
+        .reminder-content {
+            flex: 1;
+        }
+
+        .reminder-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .reminder-text {
+            font-size: var(--text-base);
+            color: var(--color-text-secondary);
+            line-height: var(--leading-relaxed);
         }
 
         .dashboard-actions {
@@ -448,6 +562,18 @@
             justify-content: center;
             gap: var(--space-4);
             flex-wrap: wrap;
+            margin-top: var(--space-8);
+        }
+
+        .btn--danger {
+            color: var(--color-error-600);
+            border-color: var(--color-error-300);
+        }
+
+        .btn--danger:hover {
+            background: var(--color-error-50);
+            border-color: var(--color-error-400);
+            color: var(--color-error-700);
         }
         /* ===== (ここまで追加) ===== */
 
@@ -3623,22 +3749,59 @@
                     <span class="dashboard-icon" aria-hidden="true">👋</span>
                     おかえりなさい！
                 </h2>
-                <p class="dashboard-subtitle">前回の診断結果の概要です。</p>
+                <p class="dashboard-subtitle">前回の診断結果の概要です。定期的な見直しでより良いライフプランを築きましょう。</p>
             </header>
             <div class="dashboard-summary">
                 <div class="summary-item">
-                    <span class="summary-label">前回の評価</span>
-                    <div id="dashboardRating" class="rating-badge rating-b">B</div>
+                    <span class="summary-label">あなたの称号</span>
+                    <div id="dashboardTitleBadge" class="title-badge">---</div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">健全度スコア</span>
+                    <div id="dashboardHealthScore" class="health-score">
+                        <span class="score-number">--</span>
+                        <span class="score-label">/ 100点</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">破綻確率</span>
+                    <div id="dashboardBreakdownProb" class="breakdown-prob">--%</div>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">最終予測資産</span>
                     <p id="dashboardFinalAssets" class="summary-value">---</p>
                 </div>
+                <div class="summary-item">
+                    <span class="summary-label">最終診断日</span>
+                    <p id="dashboardLastUpdate" class="summary-date">---</p>
+                </div>
             </div>
             <div class="dashboard-actions">
-                <button id="dashboardViewResults" class="btn btn--primary">前回の結果を詳しく見る</button>
-                <button id="dashboardEditSettings" class="btn btn--secondary">設定を編集して再診断</button>
-                <button id="dashboardReset" class="btn btn--outline">最初からやり直す</button>
+                <button id="dashboardViewResults" class="btn btn--primary">
+                    <span class="btn-icon">📊</span>
+                    前回の結果を詳しく見る
+                </button>
+                <button id="dashboardEditSettings" class="btn btn--secondary">
+                    <span class="btn-icon">✏️</span>
+                    設定を編集して再診断
+                </button>
+                <button id="dashboardReset" class="btn btn--outline">
+                    <span class="btn-icon">🆕</span>
+                    最初からやり直す
+                </button>
+                <button id="dashboardClearData" class="btn btn--outline btn--danger">
+                    <span class="btn-icon">🗑️</span>
+                    データをリセット
+                </button>
+            </div>
+            <div class="reminder-section">
+                <div class="reminder-card" id="reminderCard">
+                    <div class="reminder-icon">💡</div>
+                    <div class="reminder-content">
+                        <h4 class="reminder-title">定期的な見直しをお勧めします</h4>
+                        <p id="reminderText" class="reminder-text">---</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -4858,40 +5021,716 @@
         };
 
         // ===== アプリケーション状態 =====
+        // ===== データモデル定義 =====
+        
+        // TimelineEvent型の定義
+        class TimelineEvent {
+            constructor(id, name, type, age, amount, recurring = null) {
+                this.id = id;
+                this.name = name;
+                this.type = type; // 'income' | 'expense' | 'milestone'
+                this.age = age;
+                this.amount = amount;
+                this.recurring = recurring; // { endAge: number } または null
+            }
+        }
+
+        // YearlySnapshot型の定義  
+        class YearlySnapshot {
+            constructor(age, income, expense, cashFlow, assets) {
+                this.age = age;
+                this.income = income;
+                this.expense = expense;
+                this.cashFlow = cashFlow;
+                this.assets = assets; // { total, cash, investment }
+            }
+        }
+
+        // ActionPlan型の定義
+        class ActionPlan {
+            constructor(type, title, description, potentialImpact = null) {
+                this.type = type; // 'good' | 'warning' | 'info'
+                this.title = title;
+                this.description = description;
+                this.potentialImpact = potentialImpact;
+            }
+        }
+
+        // ===== IndexedDB データ永続化システム =====
+        class DataPersistence {
+            constructor() {
+                this.dbName = 'LifeMoneyPlanDB';
+                this.version = 1;
+                this.db = null;
+            }
+
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        resolve(this.db);
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // UserStateストア作成
+                        if (!db.objectStoreNames.contains('userState')) {
+                            const userStateStore = db.createObjectStore('userState', { keyPath: 'id' });
+                            userStateStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        }
+                        
+                        // 診断履歴ストア作成
+                        if (!db.objectStoreNames.contains('history')) {
+                            const historyStore = db.createObjectStore('history', { keyPath: 'id', autoIncrement: true });
+                            historyStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        }
+                    };
+                });
+            }
+
+            async saveUserState(userState) {
+                const transaction = this.db.transaction(['userState'], 'readwrite');
+                const store = transaction.objectStore('userState');
+                
+                const stateToSave = {
+                    id: 'current',
+                    timestamp: Date.now(),
+                    data: userState
+                };
+                
+                return new Promise((resolve, reject) => {
+                    const request = store.put(stateToSave);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async loadUserState() {
+                const transaction = this.db.transaction(['userState'], 'readonly');
+                const store = transaction.objectStore('userState');
+                
+                return new Promise((resolve, reject) => {
+                    const request = store.get('current');
+                    request.onsuccess = () => {
+                        if (request.result) {
+                            resolve(request.result.data);
+                        } else {
+                            resolve(null);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async saveToHistory(userState, results) {
+                const transaction = this.db.transaction(['history'], 'readwrite');
+                const store = transaction.objectStore('history');
+                
+                const historyEntry = {
+                    timestamp: Date.now(),
+                    userState: userState,
+                    results: results
+                };
+                
+                return new Promise((resolve, reject) => {
+                    const request = store.add(historyEntry);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async getHistory(limit = 10) {
+                const transaction = this.db.transaction(['history'], 'readonly');
+                const store = transaction.objectStore('history');
+                const index = store.index('timestamp');
+                
+                return new Promise((resolve, reject) => {
+                    const request = index.openCursor(null, 'prev');
+                    const results = [];
+                    
+                    request.onsuccess = (event) => {
+                        const cursor = event.target.result;
+                        if (cursor && results.length < limit) {
+                            results.push(cursor.value);
+                            cursor.continue();
+                        } else {
+                            resolve(results);
+                        }
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async clearAll() {
+                const transaction = this.db.transaction(['userState', 'history'], 'readwrite');
+                const userStateStore = transaction.objectStore('userState');
+                const historyStore = transaction.objectStore('history');
+                
+                await Promise.all([
+                    new Promise((resolve, reject) => {
+                        const request = userStateStore.clear();
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    }),
+                    new Promise((resolve, reject) => {
+                        const request = historyStore.clear();
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    })
+                ]);
+            }
+        }
+
+        // ===== アップグレードされたAppStateクラス =====
         class AppState {
             constructor() {
-                this.currentStep = 1;
-                this.farthestValidatedStep = 1;
-                this.basicInfo = {
-                    birthday: null,
-                    income: null,
-                    occupation: '',
-                    nationalPension実績Years: 0,
-                    nationalPension予定Years: 20,
-                    employeePension実績Years: 0,
-                    employeePension予定Years: 20,
+                this.progress = {
+                    currentStep: 1,
+                    farthestValidatedStep: 1
                 };
-                this.fixedCosts = {};
-                this.lifeEvents = {};
-                this.customLifeEvents = [];
-                this.detailSettings = {
-                    childrenCount: 1,
-                    housingAge: 35,
-                    nisaAmount: 3.3
+                
+                this.inputs = {
+                    financialPersonality: '', // 'security' | 'growth' | 'enjoyment' | 'family'
+                    basicInfo: {
+                        birthDate: '',
+                        monthlyIncome: '',
+                        occupation: ''
+                    },
+                    pension: {
+                        nationalPensionPast: 0,
+                        nationalPensionFuture: 20,
+                        employeePensionPast: 0,
+                        employeePensionFuture: 20
+                    },
+                    fixedCosts: {
+                        housing: '',
+                        food: '',
+                        utilities: '',
+                        transport: '',
+                        insurance: '',
+                        communication: '',
+                        education: '',
+                        healthcare: '',
+                        other: ''
+                    },
+                    lifeEvents: [], // TimelineEvent[]
+                    advancedSettings: {
+                        retirementAge: 65,
+                        lifeExpectancy: 95,
+                        investmentReturnRate: 3.0
+                    }
                 };
-                this.advancedSettings = { ...APP_DATA.defaultAdvancedSettings };
-                this.results = {};
+                
+                this.results = {
+                    baseSimulation: [], // YearlySnapshot[]
+                    whatIfSimulation: null, // YearlySnapshot[] | null
+                    summary: {
+                        rating: {
+                            score: 0, // 0-100
+                            title: '', // "堅実な資産形成家"
+                            breakdownProbability: 0 // 破綻確率
+                        },
+                        finalBalance: 0,
+                        retirementBalance: 0,
+                        totalIncome: 0,
+                        totalExpense: 0
+                    },
+                    actionPlans: [] // ActionPlan[]
+                };
+                
+                // 下位互換のためのプロパティ
                 this.validationErrors = new Map();
                 this.isCalculating = false;
-                this.financialPersonality = null;
+            }
+
+            // 下位互換メソッド
+            get currentStep() {
+                return this.progress.currentStep;
+            }
+
+            set currentStep(value) {
+                this.progress.currentStep = value;
+            }
+
+            get farthestValidatedStep() {
+                return this.progress.farthestValidatedStep;
+            }
+
+            set farthestValidatedStep(value) {
+                this.progress.farthestValidatedStep = value;
+            }
+
+            get basicInfo() {
+                return this.inputs.basicInfo;
+            }
+
+            get fixedCosts() {
+                return this.inputs.fixedCosts;
+            }
+
+            get lifeEvents() {
+                return this.inputs.lifeEvents;
+            }
+
+            get advancedSettings() {
+                return this.inputs.advancedSettings;
+            }
+
+            get financialPersonality() {
+                return this.inputs.financialPersonality;
+            }
+
+            set financialPersonality(value) {
+                this.inputs.financialPersonality = value;
+            }
+
+            // 年金情報の下位互換アクセサー
+            get nationalPension実績Years() {
+                return this.inputs.pension.nationalPensionPast;
+            }
+
+            set nationalPension実績Years(value) {
+                this.inputs.pension.nationalPensionPast = value;
+            }
+
+            get nationalPension予定Years() {
+                return this.inputs.pension.nationalPensionFuture;
+            }
+
+            set nationalPension予定Years(value) {
+                this.inputs.pension.nationalPensionFuture = value;
+            }
+
+            get employeePension実績Years() {
+                return this.inputs.pension.employeePensionPast;
+            }
+
+            set employeePension実績Years(value) {
+                this.inputs.pension.employeePensionPast = value;
+            }
+
+            get employeePension予定Years() {
+                return this.inputs.pension.employeePensionFuture;
+            }
+
+            set employeePension予定Years(value) {
+                this.inputs.pension.employeePensionFuture = value;
             }
         }
 
         // ===== グローバル変数 =====
         let appState = new AppState();
         let lifetimeChart = null;
+        const dataPersistence = new DataPersistence();
         let debounceTimers = new Map();
         let currentNotificationId = 0;
+
+        // ===== 健全度スコア・称号・破綻確率計算システム =====
+        const AdvancedAnalysis = {
+            // 健全度スコア計算（0-100点）
+            calculateHealthScore(yearlySnapshots, currentAge, retirementAge, lifeExpectancy) {
+                let score = 0;
+                
+                // 1. 最終資産スコア（30点満点）
+                const finalAssets = yearlySnapshots[yearlySnapshots.length - 1]?.assets.total || 0;
+                if (finalAssets >= 50000000) score += 30; // 5000万円以上で満点
+                else if (finalAssets >= 30000000) score += 25; // 3000万円
+                else if (finalAssets >= 20000000) score += 20; // 2000万円
+                else if (finalAssets >= 10000000) score += 15; // 1000万円
+                else if (finalAssets >= 5000000) score += 10;  // 500万円
+                else if (finalAssets > 0) score += 5;
+                
+                // 2. 退職時資産スコア（25点満点）
+                const retirementSnapshot = yearlySnapshots.find(s => s.age === retirementAge);
+                const retirementAssets = retirementSnapshot?.assets.total || 0;
+                if (retirementAssets >= 30000000) score += 25; // 3000万円以上で満点
+                else if (retirementAssets >= 20000000) score += 20;
+                else if (retirementAssets >= 15000000) score += 15;
+                else if (retirementAssets >= 10000000) score += 10;
+                else if (retirementAssets > 0) score += 5;
+                
+                // 3. 資産持続性スコア（20点満点）
+                const negativeYears = yearlySnapshots.filter(s => s.assets.total < 0).length;
+                const totalYears = yearlySnapshots.length;
+                const sustainabilityRatio = Math.max(0, (totalYears - negativeYears) / totalYears);
+                score += Math.round(sustainabilityRatio * 20);
+                
+                // 4. 投資資産比率スコア（15点満点）
+                const retirementInvestment = retirementSnapshot?.assets.investment || 0;
+                const investmentRatio = retirementAssets > 0 ? retirementInvestment / retirementAssets : 0;
+                if (investmentRatio >= 0.3) score += 15; // 30%以上で満点
+                else if (investmentRatio >= 0.2) score += 12;
+                else if (investmentRatio >= 0.1) score += 8;
+                else if (investmentRatio > 0) score += 4;
+                
+                // 5. 早期資産形成スコア（10点満点）
+                const age40Snapshot = yearlySnapshots.find(s => s.age === 40);
+                const age40Assets = age40Snapshot?.assets.total || 0;
+                if (age40Assets >= 10000000) score += 10; // 40歳で1000万円以上
+                else if (age40Assets >= 5000000) score += 7;
+                else if (age40Assets >= 3000000) score += 5;
+                else if (age40Assets > 0) score += 2;
+                
+                return Math.min(100, Math.max(0, score));
+            },
+
+            // 破綻確率計算
+            calculateBreakdownProbability(yearlySnapshots) {
+                const totalYears = yearlySnapshots.length;
+                const negativeYears = yearlySnapshots.filter(s => s.assets.total < 0).length;
+                const criticalYears = yearlySnapshots.filter(s => s.assets.total < 1000000 && s.age >= 65).length;
+                
+                // 基本破綻確率：資産がマイナスになる年数の割合
+                const basicRisk = (negativeYears / totalYears) * 100;
+                
+                // 高齢期リスク：65歳以降の低資産リスク
+                const elderlyRisk = (criticalYears / Math.max(1, yearlySnapshots.filter(s => s.age >= 65).length)) * 50;
+                
+                // 早期リスク：50歳時点での資産状況
+                const age50Snapshot = yearlySnapshots.find(s => s.age === 50);
+                const age50Assets = age50Snapshot?.assets.total || 0;
+                let earlyRisk = 0;
+                if (age50Assets < 1000000) earlyRisk = 30;
+                else if (age50Assets < 3000000) earlyRisk = 15;
+                else if (age50Assets < 5000000) earlyRisk = 5;
+                
+                // 総合破綻確率
+                const totalRisk = Math.min(100, basicRisk + elderlyRisk * 0.4 + earlyRisk * 0.3);
+                
+                return Math.round(totalRisk * 10) / 10; // 小数点1位まで
+            },
+
+            // 称号システム
+            generateTitle(healthScore, breakdownProbability, finalAssets, hasInvestment) {
+                if (healthScore >= 90 && breakdownProbability <= 5) {
+                    return hasInvestment ? "資産運用マスター" : "堅実な資産形成家";
+                } else if (healthScore >= 80 && breakdownProbability <= 10) {
+                    return finalAssets >= 30000000 ? "富裕層候補生" : "安定資産形成者";
+                } else if (healthScore >= 70 && breakdownProbability <= 20) {
+                    return hasInvestment ? "バランス投資家" : "計画的貯蓄家";
+                } else if (healthScore >= 60 && breakdownProbability <= 30) {
+                    return "ポテンシャル投資家";
+                } else if (healthScore >= 50) {
+                    return "資産形成チャレンジャー";
+                } else if (healthScore >= 40) {
+                    return "家計改善ビギナー";
+                } else if (healthScore >= 30) {
+                    return "節約スタートアップ";
+                } else {
+                    return "今日からスタート";
+                }
+            },
+
+            // パーソナライズド・アクションプラン生成
+            generateActionPlans(appState, healthScore, breakdownProbability) {
+                const actionPlans = [];
+                const { inputs, results } = appState;
+                const finalAssets = results.summary.finalBalance;
+                const retirementAssets = results.summary.retirementBalance;
+                
+                // 固定費分析
+                const totalFixedCosts = Object.values(inputs.fixedCosts)
+                    .filter(cost => cost !== '')
+                    .reduce((sum, cost) => sum + parseInt(cost), 0);
+                const income = parseInt(inputs.basicInfo.monthlyIncome) || 0;
+                const fixedCostRatio = income > 0 ? (totalFixedCosts / income) * 100 : 0;
+
+                // 良い点のアクション
+                if (healthScore >= 70) {
+                    actionPlans.push(new ActionPlan(
+                        'good',
+                        '素晴らしい資産形成計画',
+                        `健全度スコア${healthScore}点は平均を大きく上回っています。現在の家計管理を継続することで、安定した老後生活が期待できます。`,
+                        null
+                    ));
+                }
+
+                if (fixedCostRatio <= 70) {
+                    actionPlans.push(new ActionPlan(
+                        'good',
+                        '理想的な固定費比率',
+                        `固定費が収入の${Math.round(fixedCostRatio)}%と理想的な範囲内です。家計管理が適切に行われています。`,
+                        null
+                    ));
+                }
+
+                // 改善点のアクション
+                if (breakdownProbability > 30) {
+                    const monthlySaving = Math.ceil((retirementAssets + 10000000) / (65 - (new Date().getFullYear() - new Date(inputs.basicInfo.birthDate).getFullYear())) / 12 / 1000) * 1000;
+                    actionPlans.push(new ActionPlan(
+                        'warning',
+                        '老後資金の強化が必要',
+                        `破綻確率${breakdownProbability}%は高リスクです。月々${monthlySaving.toLocaleString()}円の追加貯蓄または固定費削減を推奨します。`,
+                        `老後資金が約1,000万円増加し、破綻確率を大幅に軽減できます`
+                    ));
+                }
+
+                if (fixedCostRatio > 80) {
+                    const reductionAmount = Math.ceil((totalFixedCosts - income * 0.7) / 1000) * 1000;
+                    actionPlans.push(new ActionPlan(
+                        'warning',
+                        '固定費の見直しが急務',
+                        `固定費が収入の${Math.round(fixedCostRatio)}%と高すぎます。月々${reductionAmount.toLocaleString()}円の削減を目指しましょう。`,
+                        `老後資金が${(reductionAmount * 12 * 30 / 10000).toFixed(0)}万円増加する効果があります`
+                    ));
+                }
+
+                // 情報・推奨アクション
+                const currentAge = new Date().getFullYear() - new Date(inputs.basicInfo.birthDate).getFullYear();
+                const investmentAssets = results.baseSimulation.find(s => s.age === 65)?.assets.investment || 0;
+                
+                if (investmentAssets < 5000000 && currentAge < 50) {
+                    actionPlans.push(new ActionPlan(
+                        'info',
+                        'NISA活用の検討',
+                        `月々3.3万円のNISA積立投資を活用することで、税制優遇を受けながら資産形成できます。`,
+                        `年利3%想定で老後資金が約1,200万円増加の可能性があります`
+                    ));
+                }
+
+                if (healthScore < 60 && fixedCostRatio < 90) {
+                    actionPlans.push(new ActionPlan(
+                        'info',
+                        '家計簿アプリの活用',
+                        `現在の家計状況を正確に把握するため、家計簿アプリでの支出管理を開始することをお勧めします。`,
+                        `支出の見える化により平均5-10%の節約効果が期待できます`
+                    ));
+                }
+
+                // 価値観に基づくアクション
+                switch (inputs.financialPersonality) {
+                    case 'security':
+                        actionPlans.push(new ActionPlan(
+                            'info',
+                            '安定重視型のあなたへ',
+                            `リスクを抑えた債券型投資信託や定期預金の活用により、着実な資産形成を目指しましょう。`,
+                            null
+                        ));
+                        break;
+                    case 'growth':
+                        actionPlans.push(new ActionPlan(
+                            'info',
+                            '成長重視型のあなたへ',
+                            `株式投資信託やETFへの積立投資により、長期的な資産成長を狙いましょう。`,
+                            null
+                        ));
+                        break;
+                    case 'family':
+                        actionPlans.push(new ActionPlan(
+                            'info',
+                            '家族重視型のあなたへ',
+                            `教育資金や住宅資金の計画的な準備と、生命保険の見直しを検討しましょう。`,
+                            null
+                        ));
+                        break;
+                }
+
+                return actionPlans.slice(0, 5); // 最大5個のアクションプランを返す
+            }
+        };
+
+        // ===== ダッシュボード管理システム =====
+        const DashboardManager = {
+            async init() {
+                try {
+                    await dataPersistence.init();
+                    const savedState = await dataPersistence.loadUserState();
+                    
+                    if (savedState && savedState.results && savedState.results.summary) {
+                        this.showDashboard(savedState);
+                        this.bindEvents();
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Dashboard initialization failed:', error);
+                }
+                return false;
+            },
+
+            showDashboard(savedState) {
+                const dashboard = Utils.getElement('personalDashboard');
+                const quickDiagnostics = Utils.getElement('quickDiagnostics');
+                const mainContent = document.querySelectorAll('.main-step-tracker, .progress-section, .step-section');
+
+                if (!dashboard || !quickDiagnostics) return;
+
+                // ダッシュボード表示
+                dashboard.style.display = 'block';
+                quickDiagnostics.style.display = 'none';
+                mainContent.forEach(el => el.style.display = 'none');
+
+                // データ描画
+                this.populateDashboard(savedState);
+                
+                // アニメーション効果
+                AnimationFramework.fadeIn(dashboard, { duration: AnimationFramework.durations.medium });
+            },
+
+            populateDashboard(savedState) {
+                const { summary } = savedState.results;
+                
+                // 称号
+                Utils.getElement('dashboardTitleBadge').textContent = summary.rating.title || '---';
+                
+                // 健全度スコア
+                const scoreElement = Utils.getElement('dashboardHealthScore');
+                const scoreNumber = scoreElement.querySelector('.score-number');
+                scoreNumber.textContent = summary.rating.score || '--';
+                
+                // スコアに応じてアニメーション
+                if (summary.rating.score >= 80) {
+                    scoreElement.classList.add('animate-pulse');
+                }
+                
+                // 破綻確率
+                const breakdownElement = Utils.getElement('dashboardBreakdownProb');
+                const breakdownProb = summary.rating.breakdownProbability || 0;
+                breakdownElement.textContent = `${breakdownProb}%`;
+                
+                // 破綻確率に応じて色分け
+                breakdownElement.classList.remove('low-risk', 'medium-risk');
+                if (breakdownProb <= 10) {
+                    breakdownElement.classList.add('low-risk');
+                } else if (breakdownProb <= 30) {
+                    breakdownElement.classList.add('medium-risk');
+                }
+                
+                // 最終予測資産
+                Utils.getElement('dashboardFinalAssets').textContent = 
+                    Utils.formatCurrency(summary.finalBalance);
+                
+                // 最終診断日
+                const lastUpdate = new Date().toLocaleDateString('ja-JP');
+                Utils.getElement('dashboardLastUpdate').textContent = lastUpdate;
+                
+                // リマインダーテキスト
+                this.updateReminderText(summary.rating.score, breakdownProb);
+            },
+
+            updateReminderText(healthScore, breakdownProb) {
+                const reminderText = Utils.getElement('reminderText');
+                let message = '';
+                
+                if (healthScore >= 80) {
+                    message = '素晴らしい資産形成計画です！年に1回程度の見直しで十分です。';
+                } else if (healthScore >= 60) {
+                    message = '良好な計画です。半年に1回の見直しで更なる改善を目指しましょう。';
+                } else if (breakdownProb > 30) {
+                    message = '改善の余地があります。3ヶ月に1回の見直しで家計を最適化しましょう。';
+                } else {
+                    message = '定期的な見直しで着実な資産形成を継続しましょう。';
+                }
+                
+                reminderText.textContent = message;
+            },
+
+            bindEvents() {
+                // 前回の結果を詳しく見る
+                Utils.getElement('dashboardViewResults').addEventListener('click', async () => {
+                    try {
+                        const savedState = await dataPersistence.loadUserState();
+                        if (savedState) {
+                            // appStateを復元
+                            Object.assign(appState, savedState);
+                            // 結果ページに直接移動
+                            NavigationManager.showStep(5);
+                            this.hideDashboard();
+                        }
+                    } catch (error) {
+                        console.error('Failed to load previous results:', error);
+                        NotificationManager.show('データの読み込みに失敗しました', 'error');
+                    }
+                });
+
+                // 設定を編集して再診断
+                Utils.getElement('dashboardEditSettings').addEventListener('click', async () => {
+                    try {
+                        const savedState = await dataPersistence.loadUserState();
+                        if (savedState) {
+                            // appStateを復元（結果以外）
+                            appState.inputs = savedState.inputs;
+                            appState.progress = savedState.progress;
+                            // ステップ1から開始
+                            NavigationManager.showStep(1);
+                            this.hideDashboard();
+                        }
+                    } catch (error) {
+                        console.error('Failed to load previous settings:', error);
+                        NotificationManager.show('データの読み込みに失敗しました', 'error');
+                    }
+                });
+
+                // 最初からやり直す
+                Utils.getElement('dashboardReset').addEventListener('click', () => {
+                    this.startNewDiagnosis();
+                });
+
+                // データをリセット
+                Utils.getElement('dashboardClearData').addEventListener('click', () => {
+                    this.clearAllData();
+                });
+            },
+
+            hideDashboard() {
+                const dashboard = Utils.getElement('personalDashboard');
+                const quickDiagnostics = Utils.getElement('quickDiagnostics');
+                const mainContent = document.querySelectorAll('.main-step-tracker, .progress-section, .step-section');
+
+                dashboard.style.display = 'none';
+                quickDiagnostics.style.display = 'block';
+                mainContent.forEach(el => el.style.display = 'block');
+            },
+
+            startNewDiagnosis() {
+                if (confirm('新しい診断を開始しますか？現在の設定は保持されます。')) {
+                    // 結果のみクリア
+                    appState.results = {
+                        baseSimulation: [],
+                        whatIfSimulation: null,
+                        summary: {
+                            rating: { score: 0, title: '', breakdownProbability: 0 },
+                            finalBalance: 0,
+                            retirementBalance: 0,
+                            totalIncome: 0,
+                            totalExpense: 0
+                        },
+                        actionPlans: []
+                    };
+                    NavigationManager.showStep(1);
+                    this.hideDashboard();
+                }
+            },
+
+            async clearAllData() {
+                if (confirm('すべてのデータを削除しますか？この操作は取り消せません。')) {
+                    try {
+                        await dataPersistence.clearAll();
+                        // appStateをリセット
+                        appState = new AppState();
+                        this.hideDashboard();
+                        NotificationManager.show('データを削除しました', 'success');
+                    } catch (error) {
+                        console.error('Failed to clear data:', error);
+                        NotificationManager.show('データの削除に失敗しました', 'error');
+                    }
+                }
+            },
+
+            async saveCurrentState() {
+                try {
+                    await dataPersistence.saveUserState(appState);
+                    if (appState.results && appState.results.summary) {
+                        await dataPersistence.saveToHistory(appState, appState.results);
+                    }
+                } catch (error) {
+                    console.error('Failed to save state:', error);
+                }
+            }
+        };
 
         // ===== ユーティリティ関数 =====
         const Utils = {
@@ -6904,34 +7743,60 @@
 
         // ===== アプリケーション初期化 =====
         const AppInitializer = {
-            init() {
-                this.loadData();
-                this.setupUI();
-                QuickDiagnosticsManager.init();
-                this.setupEventListeners();
-
-                // ダッシュボード表示制御
-                if (appState.results && appState.results.rating) {
-                    this.setupDashboard();
-                } else {
+            async init() {
+                try {
+                    // IndexedDBとダッシュボードの初期化
+                    const hasSavedData = await DashboardManager.init();
+                    
+                    if (!hasSavedData) {
+                        // 古いLocalStorageデータをマイグレーション
+                        this.loadLegacyData();
+                        this.setupUI();
+                        QuickDiagnosticsManager.init();
+                        this.setupEventListeners();
+                        UIManager.showQuickGuide();
+                    } else {
+                        // ダッシュボードが表示されている場合もUIとイベントは必要
+                        this.setupUI();
+                        QuickDiagnosticsManager.init();
+                        this.setupEventListeners();
+                    }
+                } catch (error) {
+                    console.error('App initialization error:', error);
+                    // フォールバック: 従来の初期化
+                    this.loadLegacyData();
+                    this.setupUI();
+                    QuickDiagnosticsManager.init();
+                    this.setupEventListeners();
                     UIManager.showQuickGuide();
                 }
             },
-            loadData() {
+            loadLegacyData() {
+                // LocalStorageからの従来データの読み込み（下位互換性のため）
                 const saved = StorageManager.load();
                 if (saved) {
                     const defaultState = new AppState();
-                    appState = {
-                        ...defaultState,
-                        ...saved,
-                        basicInfo: { ...defaultState.basicInfo, ...saved.basicInfo },
-                        fixedCosts: { ...defaultState.fixedCosts, ...saved.fixedCosts },
-                        lifeEvents: { ...defaultState.lifeEvents, ...saved.lifeEvents },
-                        customLifeEvents: saved.customLifeEvents || [],
-                        detailSettings: { ...defaultState.detailSettings, ...saved.detailSettings },
-                        advancedSettings: { ...defaultState.advancedSettings, ...saved.advancedSettings },
-                    };
+                    Object.assign(appState, defaultState, saved);
+                    
+                    // 新しい構造にマイグレーション
+                    if (saved.personalityType) {
+                        appState.inputs.financialPersonality = saved.personalityType;
+                    }
+                    if (saved.basicInfo) {
+                        Object.assign(appState.inputs.basicInfo, saved.basicInfo);
+                    }
+                    if (saved.fixedCosts) {
+                        Object.assign(appState.inputs.fixedCosts, saved.fixedCosts);
+                    }
+                    
+                    // IndexedDBに保存
+                    DashboardManager.saveCurrentState().catch(console.error);
                 }
+            },
+
+            loadData() {
+                // レガシーメソッド（下位互換性のため残す）
+                this.loadLegacyData();
             },
             setupUI() {
                 FormManager.setupBirthdaySelects();
