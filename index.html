@@ -8,9 +8,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js"></script>
     <style>
-        /* ===== CSS変数（デザインシステム） ===== */
+        /* ===== CSS変数（プレミアムデザインシステム） ===== */
         :root {
-            /* カラーパレット - より洗練された色使い */
+            /* プレミアムカラーパレット - 金融アプリに特化 */
             --color-primary: #2563eb;
             --color-primary-50: #eff6ff;
             --color-primary-100: #dbeafe;
@@ -22,6 +22,19 @@
             --color-primary-700: #1d4ed8;
             --color-primary-800: #1e40af;
             --color-primary-900: #1e3a8a;
+            
+            /* プレミアムグラデーション */
+            --gradient-wealth: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-growth: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-stability: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-success: linear-gradient(135deg, #11f8bb 0%, #06b6d4 100%);
+            --gradient-premium: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            
+            /* ダイナミックカラー */
+            --color-accent: #ff6b6b;
+            --color-gold: #ffd700;
+            --color-platinum: #e5e4e2;
             
             --color-secondary: #64748b;
             --color-secondary-50: #f8fafc;
@@ -101,7 +114,7 @@
             --space-24: 6rem;     /* 96px */
             --space-32: 8rem;     /* 128px */
             
-            /* タイポグラフィシステム */
+            /* プレミアムタイポグラフィシステム */
             --text-xs: 0.75rem;     /* 12px */
             --text-sm: 0.875rem;    /* 14px */
             --text-base: 1rem;      /* 16px */
@@ -112,21 +125,40 @@
             --text-4xl: 2.25rem;    /* 36px */
             --text-5xl: 3rem;       /* 48px */
             --text-6xl: 3.75rem;    /* 60px */
+            --text-7xl: 4.5rem;     /* 72px */
+            --text-8xl: 6rem;       /* 96px */
+            
+            /* フォントファミリー */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', Meiryo, sans-serif;
+            --font-display: 'Inter Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
+            --font-numbers: 'Inter', 'Roboto Mono', monospace;
             
             /* フォントウェイト */
+            --font-thin: 100;
+            --font-extralight: 200;
             --font-light: 300;
             --font-normal: 400;
             --font-medium: 500;
             --font-semibold: 600;
             --font-bold: 700;
             --font-extrabold: 800;
+            --font-black: 900;
             
             /* 行間 */
+            --leading-none: 1;
             --leading-tight: 1.25;
             --leading-snug: 1.375;
             --leading-normal: 1.5;
             --leading-relaxed: 1.625;
             --leading-loose: 2;
+            
+            /* 文字間隔 */
+            --tracking-tighter: -0.05em;
+            --tracking-tight: -0.025em;
+            --tracking-normal: 0;
+            --tracking-wide: 0.025em;
+            --tracking-wider: 0.05em;
             
             /* ボーダーラディウス */
             --radius-none: 0;
@@ -139,21 +171,37 @@
             --radius-3xl: 1.5rem;   /* 24px */
             --radius-full: 9999px;
             
-            /* シャドウシステム */
+            /* プレミアムシャドウシステム */
             --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-2xl: 0 40px 80px -12px rgba(0, 0, 0, 0.25);
             --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
             --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.1);
             
-            /* アニメーション */
-            --transition-fast: 0.15s ease;
-            --transition-base: 0.3s ease;
-            --transition-slow: 0.5s ease;
-            --transition-slower: 0.8s ease;
+            /* プレミアムシャドウ効果 */
+            --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.4);
+            --shadow-wealth: 0 8px 32px rgba(102, 126, 234, 0.2);
+            --shadow-success: 0 8px 32px rgba(16, 185, 129, 0.2);
+            --shadow-premium: 0 8px 40px rgba(255, 215, 0, 0.3);
+            --shadow-floating: 0 16px 48px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+            
+            /* アニメーションシステム */
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slower: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition-spring: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            /* マイクロインタラクション */
+            --hover-lift: translateY(-2px);
+            --hover-scale: scale(1.02);
+            --active-scale: scale(0.98);
+            --pulse-scale: scale(1.05);
             
             /* ブレークポイント */
             --breakpoint-sm: 640px;
@@ -176,15 +224,22 @@
             scroll-behavior: smooth;
         }
 
+        /* Google Fonts読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Inter+Display:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap');
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(to bottom, var(--color-secondary-50), var(--color-secondary-100));
+            font-family: var(--font-primary);
+            background: var(--gradient-hero);
             color: var(--color-text-primary);
             line-height: var(--leading-normal);
             min-height: 100vh;
             font-size: var(--text-base);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            font-feature-settings: 'kern' 1;
+            letter-spacing: var(--tracking-normal);
         }
 
         /* スクリーンリーダー専用テキスト */
@@ -209,14 +264,16 @@
         }
 
         /* ===== ヘッダー ===== */
+        /* プレミアムヘッダー */
         .header {
             text-align: center;
             margin-bottom: var(--space-16);
-            padding: var(--space-12) var(--space-8);
-            background: var(--color-surface);
+            padding: var(--space-16) var(--space-8);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             border-radius: var(--radius-3xl);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--color-border-light);
+            box-shadow: var(--shadow-floating);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -227,8 +284,31 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--color-primary-400), var(--color-primary-600), var(--color-primary-400));
+            height: 6px;
+            background: var(--gradient-wealth);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(102, 126, 234, 0.03), transparent, rgba(240, 147, 251, 0.03), transparent);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .header-content {
@@ -237,12 +317,29 @@
         }
 
         .header-title {
-            font-size: var(--text-5xl);
-            color: var(--color-primary-700);
+            font-family: var(--font-display);
+            font-size: var(--text-6xl);
+            background: var(--gradient-wealth);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: var(--space-6);
             font-weight: var(--font-extrabold);
-            letter-spacing: -0.025em;
+            letter-spacing: var(--tracking-tighter);
             line-height: var(--leading-tight);
+            position: relative;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .header-icon {
@@ -720,20 +817,40 @@
         }
 
         /* ===== カード ===== */
+        /* プレミアムカードシステム */
         .card {
-            background: var(--color-surface);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-10);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-3xl);
+            padding: var(--space-12);
             margin-bottom: var(--space-10);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--color-border-light);
-            transition: all var(--transition-slow);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all var(--transition-spring);
             position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-wealth);
+            opacity: 0.6;
         }
 
         .card:hover {
-            box-shadow: var(--shadow-base);
-            transform: translateY(-2px);
+            box-shadow: var(--shadow-floating);
+            transform: var(--hover-lift);
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+
+        .card:hover::before {
+            height: 3px;
+            opacity: 1;
         }
 
         /* ===== ステップセクション ===== */
@@ -1027,28 +1144,41 @@
             line-height: 1;
         }
 
+        /* プレミアムフォームコントロール */
         .form-control {
             width: 100%;
-            padding: var(--space-4) var(--space-5);
-            border: 2px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            padding: var(--space-5) var(--space-6);
+            border: 2px solid rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius-xl);
             font-size: var(--text-base);
-            transition: all var(--transition-base);
-            background: var(--color-surface);
+            font-family: var(--font-numbers);
+            transition: all var(--transition-spring);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
             line-height: var(--leading-normal);
             color: var(--color-text-primary);
-            font-family: inherit;
+            font-weight: var(--font-medium);
+            letter-spacing: var(--tracking-wide);
+            position: relative;
+        }
+
+        .form-control::placeholder {
+            color: var(--color-text-tertiary);
+            font-weight: var(--font-normal);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: var(--color-border-focus);
-            box-shadow: var(--shadow-focus);
-            background: var(--color-surface);
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-glow), 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            transform: var(--hover-scale);
         }
 
         .form-control:hover:not(:focus):not(:disabled) {
-            border-color: var(--color-border-medium);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: var(--hover-scale);
+            box-shadow: var(--shadow-md);
         }
 
         .form-control.error {
@@ -1978,6 +2108,7 @@
         }
 
         /* ===== ボタン ===== */
+        /* プレミアムボタンシステム */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -1985,32 +2116,60 @@
             gap: var(--space-2);
             padding: var(--space-4) var(--space-6);
             border: 2px solid transparent;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             font-size: var(--text-base);
             font-weight: var(--font-semibold);
             cursor: pointer;
-            transition: all var(--transition-base);
+            transition: all var(--transition-spring);
             text-decoration: none;
             position: relative;
             overflow: hidden;
             line-height: var(--leading-normal);
-            font-family: inherit;
+            font-family: var(--font-primary);
             white-space: nowrap;
+            backdrop-filter: blur(8px);
+            letter-spacing: var(--tracking-wide);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            background: inherit;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            opacity: 0.1;
         }
 
         .btn:focus {
             outline: none;
-            box-shadow: var(--shadow-focus);
+            box-shadow: var(--shadow-focus), var(--shadow-glow);
+            transform: var(--hover-lift);
+        }
+
+        .btn:hover {
+            transform: var(--hover-lift);
+            box-shadow: var(--shadow-floating);
         }
 
         .btn:active {
-            transform: scale(0.98);
+            transform: var(--active-scale);
+            transition-duration: 0.1s;
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .btn-icon {
@@ -2030,15 +2189,36 @@
         }
 
         .btn--primary {
-            background: var(--color-primary-500);
+            background: var(--gradient-wealth);
             color: white;
-            box-shadow: var(--shadow-base);
+            box-shadow: var(--shadow-wealth);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn--primary:hover:not(:disabled) {
-            background: var(--color-primary-600);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: var(--hover-lift);
+            box-shadow: var(--shadow-wealth), var(--shadow-floating);
+            filter: brightness(1.1);
+        }
+
+        .btn--primary:active {
+            transform: var(--active-scale);
+            filter: brightness(0.95);
+        }
+
+        .btn--success {
+            background: var(--gradient-success);
+            color: white;
+            box-shadow: var(--shadow-success);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn--premium {
+            background: var(--gradient-premium);
+            color: var(--color-text-primary);
+            box-shadow: var(--shadow-premium);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            font-weight: var(--font-bold);
         }
 
         .btn--secondary {
@@ -3118,6 +3298,202 @@
             .chart-wrapper {
                 height: 300px;
             }
+        }
+
+        /* ===== プレミアムアニメーション ===== */
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: var(--shadow-md);
+            }
+            50% {
+                box-shadow: var(--shadow-glow), var(--shadow-floating);
+            }
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1) rotate(180deg);
+            }
+        }
+
+        @keyframes shimmerSkeleton {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes celebration {
+            0% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.1) rotate(-5deg);
+            }
+            50% {
+                transform: scale(1.15) rotate(5deg);
+            }
+            75% {
+                transform: scale(1.05) rotate(-2deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* アニメーションクラス */
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-slideInRight {
+            animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-slideInLeft {
+            animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .animate-celebration {
+            animation: celebration 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animate-count-up {
+            animation: countUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* スケルトンローダー */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmerSkeleton 1.5s infinite;
+            border-radius: var(--radius-md);
+        }
+
+        .skeleton-text {
+            height: 1em;
+            margin: 0.5em 0;
+        }
+
+        .skeleton-circle {
+            border-radius: 50%;
+        }
+
+        /* ローディング状態 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-border-light);
+            border-top: 4px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* ===== アニメーション削減 ===== */
@@ -4599,11 +4975,350 @@
             }
         };
 
+        // ===== プレミアム アニメーション フレームワーク =====
+        const AnimationFramework = {
+            // Premium easing functions with cubic-bezier curves
+            easings: {
+                // Smooth and natural feeling curves
+                easeOutQuart: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                easeOutQuint: 'cubic-bezier(0.23, 1, 0.32, 1)',
+                easeOutExpo: 'cubic-bezier(0.19, 1, 0.22, 1)',
+                easeInOutCubic: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                easeInOutQuart: 'cubic-bezier(0.76, 0, 0.24, 1)',
+                easeInOutBack: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                spring: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                springBounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                smoothStep: 'cubic-bezier(0.4, 0.0, 0.2, 1.0)'
+            },
+
+            // Animation durations for different types of interactions
+            durations: {
+                micro: 150,     // Button hovers, input focus
+                short: 250,     // Form field animations, toggles
+                medium: 400,    // Step transitions, modal opens
+                long: 600,      // Page transitions, complex animations
+                extended: 1000  // Celebration effects, loading states
+            },
+
+            // Reduced motion support
+            prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+
+            // Smooth element animations
+            animate(element, keyframes, options = {}) {
+                if (!element || this.prefersReducedMotion) {
+                    return Promise.resolve();
+                }
+
+                const defaultOptions = {
+                    duration: this.durations.medium,
+                    easing: this.easings.easeOutQuart,
+                    fill: 'forwards'
+                };
+
+                const animation = element.animate(keyframes, { ...defaultOptions, ...options });
+                return animation.finished;
+            },
+
+            // Staggered animations for multiple elements
+            stagger(elements, keyframes, options = {}) {
+                if (!elements.length || this.prefersReducedMotion) {
+                    return Promise.resolve();
+                }
+
+                const staggerDelay = options.staggerDelay || 50;
+                const animations = Array.from(elements).map((element, index) => {
+                    const delay = (options.delay || 0) + (index * staggerDelay);
+                    return this.animate(element, keyframes, { ...options, delay });
+                });
+
+                return Promise.all(animations);
+            },
+
+            // Slide animations for step transitions
+            slideIn(element, direction = 'right', options = {}) {
+                const transforms = {
+                    right: ['translateX(100%)', 'translateX(0)'],
+                    left: ['translateX(-100%)', 'translateX(0)'],
+                    up: ['translateY(100%)', 'translateY(0)'],
+                    down: ['translateY(-100%)', 'translateY(0)']
+                };
+
+                return this.animate(element, {
+                    transform: transforms[direction],
+                    opacity: [0, 1]
+                }, {
+                    duration: this.durations.medium,
+                    easing: this.easings.easeOutQuart,
+                    ...options
+                });
+            },
+
+            slideOut(element, direction = 'left', options = {}) {
+                const transforms = {
+                    right: ['translateX(0)', 'translateX(100%)'],
+                    left: ['translateX(0)', 'translateX(-100%)'],
+                    up: ['translateY(0)', 'translateY(-100%)'],
+                    down: ['translateY(0)', 'translateY(100%)']
+                };
+
+                return this.animate(element, {
+                    transform: transforms[direction],
+                    opacity: [1, 0]
+                }, {
+                    duration: this.durations.medium,
+                    easing: this.easings.easeInOutQuart,
+                    ...options
+                });
+            },
+
+            // Fade animations
+            fadeIn(element, options = {}) {
+                return this.animate(element, {
+                    opacity: [0, 1],
+                    transform: ['translateY(20px)', 'translateY(0)']
+                }, {
+                    duration: this.durations.medium,
+                    easing: this.easings.easeOutQuart,
+                    ...options
+                });
+            },
+
+            fadeOut(element, options = {}) {
+                return this.animate(element, {
+                    opacity: [1, 0],
+                    transform: ['translateY(0)', 'translateY(-20px)']
+                }, {
+                    duration: this.durations.short,
+                    easing: this.easings.easeInOutCubic,
+                    ...options
+                });
+            },
+
+            // Scale animations for interactive feedback
+            scaleIn(element, options = {}) {
+                return this.animate(element, {
+                    transform: ['scale(0.8)', 'scale(1)'],
+                    opacity: [0, 1]
+                }, {
+                    duration: this.durations.short,
+                    easing: this.easings.springBounce,
+                    ...options
+                });
+            },
+
+            pulse(element, options = {}) {
+                return this.animate(element, {
+                    transform: ['scale(1)', 'scale(1.05)', 'scale(1)']
+                }, {
+                    duration: this.durations.short,
+                    easing: this.easings.easeInOutCubic,
+                    ...options
+                });
+            },
+
+            // Number counting animation
+            countUp(element, start, end, options = {}) {
+                if (this.prefersReducedMotion) {
+                    element.textContent = end.toLocaleString();
+                    return Promise.resolve();
+                }
+
+                const duration = options.duration || this.durations.long;
+                const formatter = options.formatter || (val => Math.round(val).toLocaleString());
+                
+                return new Promise(resolve => {
+                    const startTime = performance.now();
+                    const difference = end - start;
+
+                    const step = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        // Use easeOutQuart for smooth counting
+                        const easeProgress = 1 - Math.pow(1 - progress, 4);
+                        const current = start + (difference * easeProgress);
+                        
+                        element.textContent = formatter(current);
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(step);
+                        } else {
+                            element.textContent = formatter(end);
+                            resolve();
+                        }
+                    };
+                    
+                    requestAnimationFrame(step);
+                });
+            },
+
+            // Celebration particle effect
+            celebrateSuccess(element, options = {}) {
+                if (this.prefersReducedMotion) {
+                    return Promise.resolve();
+                }
+
+                const particles = options.particles || 15;
+                const colors = options.colors || ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+                const container = element.closest('.step-section') || document.body;
+                
+                const particleElements = [];
+                
+                for (let i = 0; i < particles; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: absolute;
+                        width: 8px;
+                        height: 8px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 10000;
+                    `;
+                    
+                    const rect = element.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    particle.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';
+                    particle.style.top = (rect.top - containerRect.top + rect.height / 2) + 'px';
+                    
+                    container.appendChild(particle);
+                    particleElements.push(particle);
+                }
+
+                const animations = particleElements.map((particle, index) => {
+                    const angle = (360 / particles) * index;
+                    const distance = 100 + Math.random() * 50;
+                    const x = Math.cos(angle * Math.PI / 180) * distance;
+                    const y = Math.sin(angle * Math.PI / 180) * distance;
+                    
+                    return this.animate(particle, [
+                        { 
+                            transform: 'translate(0, 0) scale(1)', 
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translate(${x}px, ${y}px) scale(0)`, 
+                            opacity: 0 
+                        }
+                    ], {
+                        duration: this.durations.long,
+                        easing: this.easings.easeOutQuart
+                    });
+                });
+
+                return Promise.all(animations).then(() => {
+                    particleElements.forEach(particle => particle.remove());
+                });
+            },
+
+            // Progress bar animation
+            animateProgress(element, percentage, options = {}) {
+                return this.animate(element, {
+                    width: [`0%`, `${percentage}%`]
+                }, {
+                    duration: this.durations.long,
+                    easing: this.easings.easeOutQuart,
+                    ...options
+                });
+            },
+
+            // Skeleton loading animation
+            createSkeleton(element, options = {}) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton-loader';
+                skeleton.style.cssText = `
+                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                    background-size: 200% 100%;
+                    border-radius: 4px;
+                    height: ${options.height || '1em'};
+                    width: ${options.width || '100%'};
+                    animation: skeleton-loading 1.5s infinite;
+                `;
+
+                // Add skeleton loading animation keyframes if not exists
+                if (!document.querySelector('#skeleton-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'skeleton-styles';
+                    style.textContent = `
+                        @keyframes skeleton-loading {
+                            0% { background-position: -200% 0; }
+                            100% { background-position: 200% 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                return skeleton;
+            }
+        };
+
+        // Intersection Observer for scroll animations
+        const ScrollAnimationObserver = {
+            observer: null,
+            observedElements: new Set(),
+
+            init() {
+                if (this.observer || AnimationFramework.prefersReducedMotion) return;
+
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.animateElement(entry.target);
+                            this.observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+
+                this.observeExistingElements();
+            },
+
+            observeExistingElements() {
+                // Observe cards, forms, and other content elements
+                const selectors = [
+                    '.fixed-cost-item',
+                    '.life-event-item', 
+                    '.result-card',
+                    '.custom-event-item',
+                    '.section-content',
+                    '.notification'
+                ];
+
+                selectors.forEach(selector => {
+                    document.querySelectorAll(selector).forEach(element => {
+                        this.observe(element);
+                    });
+                });
+            },
+
+            observe(element) {
+                if (this.observedElements.has(element) || !this.observer) return;
+                
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(30px)';
+                
+                this.observer.observe(element);
+                this.observedElements.add(element);
+            },
+
+            animateElement(element) {
+                AnimationFramework.fadeIn(element);
+                this.observedElements.delete(element);
+            }
+        };
+
         // ===== 通知管理システム =====
         const NotificationManager = {
             show(message, type = 'info', duration = APP_CONFIG.NOTIFICATION_DURATION) {
                 const existingNotification = document.querySelector('.notification');
-                if(existingNotification) existingNotification.remove();
+                if(existingNotification) {
+                    AnimationFramework.slideOut(existingNotification, 'right').then(() => {
+                        existingNotification.remove();
+                    });
+                }
 
                 const notification = document.createElement('div');
                 notification.className = `notification notification--${type}`;
@@ -4614,21 +5329,34 @@
 
                 notification.innerHTML = `<span class="notification-icon">${icons[type]}</span> ${message}`;
                 Object.assign(notification.style, {
-                    position: 'fixed', top: '20px', right: '20px', padding: '15px 20px', borderRadius: '8px',
-                    color: 'white', background: colors[type], zIndex: '10000', transform: 'translateX(120%)',
-                    opacity: '0', transition: 'all 0.4s ease', boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                    position: 'fixed', 
+                    top: '20px', 
+                    right: '20px', 
+                    padding: '15px 20px', 
+                    borderRadius: '8px',
+                    color: 'white', 
+                    background: colors[type], 
+                    zIndex: '10000',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                    opacity: '0',
+                    transform: 'translateX(120%)'
                 });
+                
                 document.body.appendChild(notification);
                 
-                requestAnimationFrame(() => {
-                    notification.style.transform = 'translateX(0)';
-                    notification.style.opacity = '1';
+                // Animate in with premium slide effect
+                AnimationFramework.slideIn(notification, 'left').then(() => {
+                    // Add pulse effect for success messages
+                    if (type === 'success') {
+                        AnimationFramework.pulse(notification);
+                    }
                 });
 
+                // Animate out
                 setTimeout(() => {
-                    notification.style.transform = 'translateX(120%)';
-                    notification.style.opacity = '0';
-                    setTimeout(() => notification.remove(), 400);
+                    AnimationFramework.slideOut(notification, 'right').then(() => {
+                        notification.remove();
+                    });
                 }, duration);
             }
         };
@@ -4805,9 +5533,26 @@
         const UIManager = {
             updateProgress() {
                 const percentage = appState.currentStep * 20;
-                Utils.getElement('progressFill').style.width = `${percentage}%`;
-                Utils.getElement('progressPercentage').textContent = `${percentage}%`;
-                Utils.getElement('progressSummary').textContent = `ステップ ${appState.currentStep} / 5 を入力中`;
+                const progressFill = Utils.getElement('progressFill');
+                const progressPercentage = Utils.getElement('progressPercentage');
+                const progressSummary = Utils.getElement('progressSummary');
+                
+                // Animate progress bar
+                AnimationFramework.animateProgress(progressFill, percentage);
+                
+                // Animate percentage count
+                const currentPercentage = parseInt(progressPercentage.textContent) || 0;
+                AnimationFramework.countUp(progressPercentage, currentPercentage, percentage, {
+                    formatter: (val) => `${Math.round(val)}%`,
+                    duration: AnimationFramework.durations.medium
+                });
+                
+                // Update summary with subtle fade
+                AnimationFramework.fadeOut(progressSummary, { duration: 150 }).then(() => {
+                    progressSummary.textContent = `ステップ ${appState.currentStep} / 5 を入力中`;
+                    AnimationFramework.fadeIn(progressSummary, { duration: 150 });
+                });
+                
                 this.updateStepLabels();
                 this.updateMainSteps();
             },
@@ -4827,11 +5572,38 @@
                     else if (stepNum < appState.currentStep) label.classList.add('completed');
                 });
             },
-            showStep(stepNumber) {
-                document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
-                Utils.getElement(`step${stepNumber}`).classList.add('active');
+            async showStep(stepNumber, direction = 'forward') {
+                const currentSection = document.querySelector('.step-section.active');
+                const targetSection = Utils.getElement(`step${stepNumber}`);
+                
+                if (!targetSection) return;
+
+                // Prepare for animation
+                if (currentSection && currentSection !== targetSection) {
+                    // Animate out current section
+                    const slideDirection = direction === 'forward' ? 'left' : 'right';
+                    await AnimationFramework.slideOut(currentSection, slideDirection);
+                    currentSection.classList.remove('active');
+                }
+
+                // Set up target section
+                targetSection.classList.add('active');
                 appState.currentStep = stepNumber;
+
+                // Animate in new section
+                if (currentSection && currentSection !== targetSection) {
+                    const slideDirection = direction === 'forward' ? 'right' : 'left';
+                    await AnimationFramework.slideIn(targetSection, slideDirection);
+                }
+
+                // Update progress with animation
                 this.updateProgress();
+                
+                // Trigger scroll animations for new content
+                ScrollAnimationObserver.observeExistingElements();
+
+                // Smooth scroll to top of section
+                Utils.scrollToElement(targetSection, 20);
             },
             showError(elementId, message) {
                 const errorElement = Utils.getElement(`${elementId}Error`, false);
@@ -4849,10 +5621,100 @@
                 if (inputElement) inputElement.classList.remove('error');
             },
             showLoading() {
-                Utils.getElement('loadingAnimation').classList.add('active');
+                const loadingElement = Utils.getElement('loadingAnimation');
+                loadingElement.classList.add('active');
+                
+                // Add skeleton loaders to results section
+                this.showResultSkeletons();
+                
+                // Animate loading appearance
+                AnimationFramework.fadeIn(loadingElement, {
+                    duration: AnimationFramework.durations.short
+                });
             },
+            
             hideLoading() {
-                Utils.getElement('loadingAnimation').classList.remove('active');
+                const loadingElement = Utils.getElement('loadingAnimation');
+                
+                AnimationFramework.fadeOut(loadingElement, {
+                    duration: AnimationFramework.durations.short
+                }).then(() => {
+                    loadingElement.classList.remove('active');
+                });
+                
+                // Remove skeleton loaders
+                this.hideResultSkeletons();
+            },
+
+            showResultSkeletons() {
+                const chartPlaceholder = Utils.getElement('chartPlaceholder', false);
+                const advicePlaceholder = Utils.getElement('advicePlaceholder', false);
+                
+                if (chartPlaceholder) {
+                    const chartSkeleton = AnimationFramework.createSkeleton(chartPlaceholder, {
+                        height: '300px',
+                        width: '100%'
+                    });
+                    chartSkeleton.id = 'chartSkeleton';
+                    chartPlaceholder.appendChild(chartSkeleton);
+                }
+                
+                if (advicePlaceholder) {
+                    // Create multiple skeleton lines for advice
+                    for (let i = 0; i < 3; i++) {
+                        const lineSkeleton = AnimationFramework.createSkeleton(advicePlaceholder, {
+                            height: '1.2em',
+                            width: `${90 - i * 10}%`
+                        });
+                        lineSkeleton.style.marginBottom = '10px';
+                        lineSkeleton.classList.add('advice-skeleton');
+                        advicePlaceholder.appendChild(lineSkeleton);
+                    }
+                }
+
+                // Skeleton for summary cards
+                const summaryContainer = Utils.getElement('resultsSummaryCards', false);
+                if (summaryContainer) {
+                    for (let i = 0; i < 4; i++) {
+                        const cardSkeleton = document.createElement('div');
+                        cardSkeleton.className = 'result-card card-skeleton';
+                        cardSkeleton.style.padding = '20px';
+                        
+                        const iconSkeleton = AnimationFramework.createSkeleton(cardSkeleton, {
+                            height: '40px',
+                            width: '40px'
+                        });
+                        iconSkeleton.style.borderRadius = '50%';
+                        iconSkeleton.style.marginBottom = '10px';
+                        
+                        const labelSkeleton = AnimationFramework.createSkeleton(cardSkeleton, {
+                            height: '1em',
+                            width: '70%'
+                        });
+                        labelSkeleton.style.marginBottom = '8px';
+                        
+                        const valueSkeleton = AnimationFramework.createSkeleton(cardSkeleton, {
+                            height: '1.5em',
+                            width: '90%'
+                        });
+                        
+                        cardSkeleton.appendChild(iconSkeleton);
+                        cardSkeleton.appendChild(labelSkeleton);
+                        cardSkeleton.appendChild(valueSkeleton);
+                        summaryContainer.appendChild(cardSkeleton);
+                    }
+                }
+            },
+
+            hideResultSkeletons() {
+                // Remove all skeleton elements
+                document.querySelectorAll('#chartSkeleton, .advice-skeleton, .card-skeleton').forEach(skeleton => {
+                    AnimationFramework.fadeOut(skeleton, {
+                        duration: AnimationFramework.durations.micro
+                    }).then(() => {
+                        skeleton.remove();
+                    });
+                });
             },
             updatePlaceholders(showResults = false) {
                 Utils.getElement('chartPlaceholder').style.display = showResults ? 'none' : 'flex';
@@ -5051,12 +5913,54 @@
             render() {
                 const container = Utils.getElement('fixedCostsGrid');
                 container.innerHTML = APP_DATA.categories.map(cat => this.createCostItem(cat)).join('');
+                
+                // Add progressive animations to form items
+                const costItems = container.querySelectorAll('.fixed-cost-item');
+                AnimationFramework.stagger(costItems, {
+                    opacity: [0, 1],
+                    transform: ['translateY(20px)', 'translateY(0)']
+                }, {
+                    staggerDelay: 100,
+                    duration: AnimationFramework.durations.medium,
+                    easing: AnimationFramework.easings.easeOutQuart
+                });
+
                 APP_DATA.categories.forEach(cat => {
                     const input = Utils.getElement(`cost-${cat.id}`);
                     input.value = appState.fixedCosts[cat.id]?.amount > 0 ? appState.fixedCosts[cat.id].amount : '';
+                    
+                    // Enhanced input interactions
+                    this.enhanceInputInteractions(input);
                     input.addEventListener('input', () => Utils.debounce('updateFixedCosts', () => this.updateCosts(), 300));
                 });
                 this.updateCosts();
+            },
+
+            enhanceInputInteractions(input) {
+                const costItem = input.closest('.fixed-cost-item');
+                
+                // Focus animations
+                input.addEventListener('focus', () => {
+                    AnimationFramework.scaleIn(costItem, {
+                        duration: AnimationFramework.durations.short
+                    });
+                    costItem.style.transform = 'scale(1.02)';
+                    costItem.style.transition = `transform ${AnimationFramework.durations.short}ms ${AnimationFramework.easings.spring}`;
+                });
+
+                input.addEventListener('blur', () => {
+                    costItem.style.transform = 'scale(1)';
+                });
+
+                // Input value change celebrations
+                input.addEventListener('input', (e) => {
+                    const value = parseFloat(e.target.value);
+                    if (value > 0) {
+                        AnimationFramework.pulse(costItem, {
+                            duration: AnimationFramework.durations.micro
+                        });
+                    }
+                });
             },
             createCostItem(category) {
                 return `
@@ -5074,23 +5978,89 @@
             },
             updateCosts() {
                 let total = 0;
+                let hasActiveItems = false;
+                
                 APP_DATA.categories.forEach(cat => {
                     const input = Utils.getElement(`cost-${cat.id}`);
                     const amount = Utils.parseNumber(input.value, 0);
+                    const wasActive = appState.fixedCosts[cat.id]?.isActive || false;
+                    
                     appState.fixedCosts[cat.id] = { amount, isActive: amount > 0 };
-                    input.closest('.fixed-cost-item').classList.toggle('active', amount > 0);
+                    const costItem = input.closest('.fixed-cost-item');
+                    
+                    // Animate item activation/deactivation
+                    if (amount > 0 && !wasActive) {
+                        costItem.classList.add('active');
+                        AnimationFramework.scaleIn(costItem, {
+                            duration: AnimationFramework.durations.short
+                        });
+                        hasActiveItems = true;
+                    } else if (amount === 0 && wasActive) {
+                        costItem.classList.remove('active');
+                    } else {
+                        costItem.classList.toggle('active', amount > 0);
+                    }
+                    
                     if (amount > 0) total = Utils.preciseAdd(total, amount);
                 });
 
-                Utils.getElement('totalFixedCosts').textContent = Utils.formatCurrency(total);
+                // Animate total cost update
+                const totalElement = Utils.getElement('totalFixedCosts');
+                const currentTotal = parseFloat(totalElement.textContent.replace(/[^\d.-]/g, '')) || 0;
+                
+                if (currentTotal !== total) {
+                    AnimationFramework.countUp(totalElement, currentTotal, total, {
+                        formatter: (val) => Utils.formatCurrency(val),
+                        duration: AnimationFramework.durations.medium
+                    });
+                }
+
+                // Animate ratio update
                 const income = appState.basicInfo.income || 0;
                 const ratio = income > 0 ? Utils.precisePercentage(total, income) : 0;
-                Utils.getElement('fixedCostsRatio').textContent = `${ratio.toFixed(0)}%`;
+                const ratioElement = Utils.getElement('fixedCostsRatio');
+                const currentRatio = parseInt(ratioElement.textContent) || 0;
                 
+                if (currentRatio !== Math.round(ratio)) {
+                    AnimationFramework.countUp(ratioElement, currentRatio, Math.round(ratio), {
+                        formatter: (val) => `${Math.round(val)}%`,
+                        duration: AnimationFramework.durations.medium
+                    });
+                }
+                
+                // Animate advice update
                 const adviceEl = Utils.getElement('ratioAdvice');
-                if (ratio > 50) { adviceEl.textContent = '🚨 固定費比率が高すぎます！見直しを強く推奨します。'; adviceEl.className = 'ratio-advice advice-error';}
-                else if (ratio > 40) { adviceEl.textContent = '🤔 固定費比率がやや高めです。見直しの余地がありそうです。'; adviceEl.className = 'ratio-advice advice-warning';}
-                else { adviceEl.textContent = '✅ 理想的な固定費比率です！'; adviceEl.className = 'ratio-advice advice-good';}
+                let newAdvice, newClass;
+                
+                if (ratio > 50) { 
+                    newAdvice = '🚨 固定費比率が高すぎます！見直しを強く推奨します。'; 
+                    newClass = 'ratio-advice advice-error';
+                } else if (ratio > 40) { 
+                    newAdvice = '🤔 固定費比率がやや高めです。見直しの余地がありそうです。'; 
+                    newClass = 'ratio-advice advice-warning';
+                } else { 
+                    newAdvice = '✅ 理想的な固定費比率です！'; 
+                    newClass = 'ratio-advice advice-good';
+                }
+                
+                if (adviceEl.textContent !== newAdvice) {
+                    AnimationFramework.fadeOut(adviceEl, { duration: 150 }).then(() => {
+                        adviceEl.textContent = newAdvice;
+                        adviceEl.className = newClass;
+                        AnimationFramework.fadeIn(adviceEl, { duration: 150 });
+                    });
+                }
+
+                // Celebrate when user completes filling out costs
+                if (hasActiveItems && total > 0) {
+                    const completionRate = APP_DATA.categories.filter(cat => 
+                        appState.fixedCosts[cat.id]?.isActive
+                    ).length / APP_DATA.categories.length;
+                    
+                    if (completionRate >= 0.5) { // 50% completion
+                        AnimationFramework.pulse(totalElement);
+                    }
+                }
             }
         };
 
@@ -5099,9 +6069,34 @@
             render() {
                 const container = Utils.getElement('lifeEventsGrid');
                 container.innerHTML = APP_DATA.lifeEvents.map(event => this.createEventItem(event)).join('');
+                
+                // Animate life event items with stagger
+                const eventItems = container.querySelectorAll('.life-event-item');
+                AnimationFramework.stagger(eventItems, {
+                    opacity: [0, 1],
+                    transform: ['translateX(-30px)', 'translateX(0)']
+                }, {
+                    staggerDelay: 80,
+                    duration: AnimationFramework.durations.medium,
+                    easing: AnimationFramework.easings.easeOutQuart
+                });
+
                 container.querySelectorAll('.life-event-item').forEach(item => {
                     item.addEventListener('click', () => this.toggleEvent(item.dataset.eventKey, item));
+                    
+                    // Add hover effects
+                    item.addEventListener('mouseenter', () => {
+                        if (!AnimationFramework.prefersReducedMotion) {
+                            item.style.transform = 'translateY(-2px)';
+                            item.style.transition = `transform ${AnimationFramework.durations.micro}ms ${AnimationFramework.easings.easeOutQuart}`;
+                        }
+                    });
+                    
+                    item.addEventListener('mouseleave', () => {
+                        item.style.transform = 'translateY(0)';
+                    });
                 });
+                
                 this.updateDetailSettingsVisibility();
             },
             createEventItem(event) {
@@ -5117,9 +6112,30 @@
                     </div>`;
             },
             toggleEvent(key, item) {
+                const wasSelected = appState.lifeEvents[key];
                 appState.lifeEvents[key] = !appState.lifeEvents[key];
+                
+                // Animate toggle
+                AnimationFramework.pulse(item, {
+                    duration: AnimationFramework.durations.short
+                });
+
                 item.classList.toggle('selected');
-                item.querySelector('.toggle-switch').classList.toggle('active');
+                const toggle = item.querySelector('.toggle-switch');
+                toggle.classList.toggle('active');
+                
+                // Celebration effect for important life events
+                if (!wasSelected && appState.lifeEvents[key]) {
+                    if (['marriage', 'children', 'housing'].includes(key)) {
+                        setTimeout(() => {
+                            AnimationFramework.celebrateSuccess(item, {
+                                particles: 8,
+                                colors: ['#10b981', '#3b82f6', '#f59e0b']
+                            });
+                        }, 200);
+                    }
+                }
+                
                 this.updateDetailSettingsVisibility();
                 FormManager.autoSave();
             },
@@ -5266,7 +6282,7 @@
 
         // ===== ナビゲーション管理システム =====
         const NavigationManager = {
-            nextStep() {
+            async nextStep() {
                 FormManager.saveCurrentStepData();
                 if (!StepValidator.validateStep(appState.currentStep)) {
                     NotificationManager.show('入力内容を確認してください', 'error');
@@ -5274,14 +6290,27 @@
                 }
                 if (appState.currentStep < 5) {
                     appState.farthestValidatedStep = Math.max(appState.farthestValidatedStep, appState.currentStep + 1);
-                    UIManager.showStep(appState.currentStep + 1);
+                    await UIManager.showStep(appState.currentStep + 1, 'forward');
+                    
+                    // Celebrate milestone completion
+                    if (appState.currentStep === 5) {
+                        const completeButton = document.querySelector('.btn-primary');
+                        if (completeButton) {
+                            AnimationFramework.celebrateSuccess(completeButton);
+                        }
+                    }
                 }
             },
-            previousStep() {
-                if (appState.currentStep > 1) UIManager.showStep(appState.currentStep - 1);
+            async previousStep() {
+                if (appState.currentStep > 1) {
+                    await UIManager.showStep(appState.currentStep - 1, 'backward');
+                }
             },
-            goToStep(targetStep) {
-                if (targetStep <= appState.farthestValidatedStep) UIManager.showStep(targetStep);
+            async goToStep(targetStep) {
+                if (targetStep <= appState.farthestValidatedStep) {
+                    const direction = targetStep > appState.currentStep ? 'forward' : 'backward';
+                    await UIManager.showStep(targetStep, direction);
+                }
             }
         };
 
@@ -5483,23 +6512,67 @@
         // ===== 結果管理システム =====
         const ResultsManager = {
             render() {
-                this.renderRatingAndSummary();
-                this.renderSummaryCards();
-                this.renderChart();
-                this.initWhatIf();
-                this.renderAdvice();
-                this.renderBreakdown();
+                // Animate results appearance with stagger
+                const sections = [
+                    () => this.renderRatingAndSummary(),
+                    () => this.renderSummaryCards(),
+                    () => this.renderChart(),
+                    () => this.initWhatIf(),
+                    () => this.renderAdvice(),
+                    () => this.renderBreakdown()
+                ];
+
+                sections.forEach((renderFunc, index) => {
+                    setTimeout(() => {
+                        renderFunc();
+                    }, index * 200);
+                });
+
+                // Celebration for good results
+                const { rating } = appState.results;
+                if (['S', 'A'].includes(rating)) {
+                    setTimeout(() => {
+                        const ratingElement = document.querySelector('.rating-badge');
+                        if (ratingElement) {
+                            AnimationFramework.celebrateSuccess(ratingElement, {
+                                particles: 20,
+                                colors: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
+                            });
+                        }
+                    }, 1000);
+                }
             },
+            
             renderRatingAndSummary() {
                 const { rating, finalBalance } = appState.results;
                 const ratingMap = {
-                    'S': { text: 'S', class: 'rating-s', msg: '素晴らしい！' }, 'A': { text: 'A', class: 'rating-a', msg: '良好です！' },
-                    'B': { text: 'B', class: 'rating-b', msg: 'まずまずです。' }, 'C': { text: 'C', class: 'rating-c', msg: '要注意。' },
+                    'S': { text: 'S', class: 'rating-s', msg: '素晴らしい！' }, 
+                    'A': { text: 'A', class: 'rating-a', msg: '良好です！' },
+                    'B': { text: 'B', class: 'rating-b', msg: 'まずまずです。' }, 
+                    'C': { text: 'C', class: 'rating-c', msg: '要注意。' },
                     'D': { text: 'D', class: 'rating-d', msg: '危険水域。' }
                 };
+                
                 const currentRating = ratingMap[rating];
-                Utils.getElement('ratingDisplay').innerHTML = `<div class="rating-badge ${currentRating.class}">${currentRating.text}</div>`;
-                Utils.getElement('resultsMainSummary').innerHTML = `最終的に <strong>${Utils.formatCurrency(finalBalance)}</strong> の資産が見込まれます。${currentRating.msg}`;
+                const ratingDisplay = Utils.getElement('ratingDisplay');
+                
+                // Animate rating badge appearance
+                ratingDisplay.innerHTML = `<div class="rating-badge ${currentRating.class}" style="opacity: 0; transform: scale(0.5);">${currentRating.text}</div>`;
+                const badge = ratingDisplay.querySelector('.rating-badge');
+                
+                AnimationFramework.scaleIn(badge, {
+                    duration: AnimationFramework.durations.medium
+                });
+
+                // Animate final balance counting
+                const summaryElement = Utils.getElement('resultsMainSummary');
+                summaryElement.innerHTML = `最終的に <strong id="finalBalanceCounter">0</strong> の資産が見込まれます。${currentRating.msg}`;
+                
+                const balanceCounter = document.getElementById('finalBalanceCounter');
+                AnimationFramework.countUp(balanceCounter, 0, finalBalance, {
+                    formatter: (val) => Utils.formatCurrency(val),
+                    duration: AnimationFramework.durations.extended
+                });
             },
             renderSummaryCards() {
                 const container = Utils.getElement('resultsSummaryCards');
@@ -5510,12 +6583,35 @@
                     { icon: '🏦', label: '最終資産', value: finalBalance, positive: finalBalance >= 0 },
                     { icon: '👴', label: '退職時資産', value: retirementAssets, positive: retirementAssets >= 0 }
                 ];
-                container.innerHTML = cards.map(c => `
-                    <div class="result-card">
+                
+                container.innerHTML = cards.map((c, index) => `
+                    <div class="result-card" style="opacity: 0; transform: translateY(30px);">
                         <div class="result-icon">${c.icon}</div>
                         <div class="result-label">${c.label}</div>
-                        <div class="result-value ${c.positive ? 'positive' : 'negative'}">${Utils.formatCurrency(c.value)}</div>
+                        <div class="result-value ${c.positive ? 'positive' : 'negative'}" data-target="${c.value}">0</div>
                     </div>`).join('');
+
+                // Animate cards with stagger
+                const cardElements = container.querySelectorAll('.result-card');
+                AnimationFramework.stagger(cardElements, {
+                    opacity: [0, 1],
+                    transform: ['translateY(30px)', 'translateY(0)']
+                }, {
+                    staggerDelay: 150,
+                    duration: AnimationFramework.durations.medium,
+                    easing: AnimationFramework.easings.easeOutQuart
+                });
+
+                // Animate number counting for each card
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        const valueElement = cardElements[index].querySelector('.result-value');
+                        AnimationFramework.countUp(valueElement, 0, card.value, {
+                            formatter: (val) => Utils.formatCurrency(val),
+                            duration: AnimationFramework.durations.long
+                        });
+                    }, index * 200);
+                });
             },
             renderChart() {
                 const ctx = Utils.getElement('lifetimeChart').getContext('2d');
@@ -5843,14 +6939,81 @@
                 CustomEventManager.setup();
                 FormManager.restoreFormData();
                 
+                // Initialize scroll animations
+                ScrollAnimationObserver.init();
+                
                 // 結果データがない場合は、必ずステップ1から開始
-                if                
-
-// 結果データがない場合は、必ずステップ1から開始
                 if (!appState.results || !appState.results.rating) {
                     appState.currentStep = 1;
                 }
                 UIManager.showStep(appState.currentStep);
+
+                // Add premium interaction animations to buttons and form elements
+                this.enhanceInteractions();
+            },
+
+            enhanceInteractions() {
+                // Enhance all buttons with hover effects
+                document.querySelectorAll('.btn').forEach(button => {
+                    button.addEventListener('mouseenter', () => {
+                        if (!AnimationFramework.prefersReducedMotion) {
+                            AnimationFramework.animate(button, {
+                                transform: ['scale(1)', 'scale(1.05)']
+                            }, {
+                                duration: AnimationFramework.durations.micro,
+                                easing: AnimationFramework.easings.easeOutQuart
+                            });
+                        }
+                    });
+
+                    button.addEventListener('mouseleave', () => {
+                        if (!AnimationFramework.prefersReducedMotion) {
+                            AnimationFramework.animate(button, {
+                                transform: ['scale(1.05)', 'scale(1)']
+                            }, {
+                                duration: AnimationFramework.durations.micro,
+                                easing: AnimationFramework.easings.easeInOutCubic
+                            });
+                        }
+                    });
+
+                    button.addEventListener('click', () => {
+                        AnimationFramework.pulse(button, {
+                            duration: AnimationFramework.durations.short
+                        });
+                    });
+                });
+
+                // Enhance form inputs with focus animations
+                document.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.addEventListener('focus', () => {
+                        AnimationFramework.animate(input, {
+                            transform: ['scale(1)', 'scale(1.02)']
+                        }, {
+                            duration: AnimationFramework.durations.short,
+                            easing: AnimationFramework.easings.spring
+                        });
+                    });
+
+                    input.addEventListener('blur', () => {
+                        AnimationFramework.animate(input, {
+                            transform: ['scale(1.02)', 'scale(1)']
+                        }, {
+                            duration: AnimationFramework.durations.short,
+                            easing: AnimationFramework.easings.easeInOutCubic
+                        });
+                    });
+                });
+
+                // Enhance step navigation with smooth scrolling
+                document.querySelectorAll('.step-label').forEach(label => {
+                    label.addEventListener('click', () => {
+                        const targetStep = parseInt(label.dataset.step);
+                        if (targetStep <= appState.farthestValidatedStep) {
+                            NavigationManager.goToStep(targetStep);
+                        }
+                    });
+                });
             },
             setupDashboard() {
                 const dashboard = Utils.getElement('personalDashboard');
