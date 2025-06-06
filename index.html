@@ -150,10 +150,10 @@
             --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.1);
             
             /* アニメーション */
-        --transition-fast: 0.15s ease;
-        --transition-base: 0.3s ease;
-        --transition-slow: 0.5s ease;
-        --transition-slower: 0.8s ease;
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --transition-slower: 0.8s ease;
             
             /* ブレークポイント */
             --breakpoint-sm: 640px;
@@ -5317,7 +5317,7 @@
                 let yearlyData = [];
 
                 for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
-                    const eventsForAge = []; // 依頼1-1: eventsForAgeを宣言
+                    const eventsForAge = [];
                     const isRetired = age >= retirementAge;
                     const annualIncome = isRetired ? (totalPensionPerMonthInManYen * 12) : ((appState.basicInfo.income || 0) * 12);
                     
@@ -5325,7 +5325,6 @@
                     
                     let eventCost = 0;
                     
-                    // 依頼1-1: カスタムライフイベント
                     appState.customLifeEvents.forEach(e => {
                         if (e.age === age) {
                             eventCost += e.amount;
@@ -5333,9 +5332,8 @@
                         }
                     });
 
-                    // 依頼1-1: 主要ライフイベント
                     const marriageEvent = APP_DATA.lifeEvents.find(e => e.key === 'marriage');
-                    if (appState.lifeEvents.marriage && age === (currentAge + 5)) {
+                    if (appState.lifeEvents.marriage && age === (currentAge + 5)) { // 仮に現在から5年後
                         eventCost += marriageEvent.cost;
                         eventsForAge.push({ type: 'marriage', label: '結婚', icon: marriageEvent.icon });
                     }
@@ -5386,7 +5384,7 @@
                         cumulativeCash: cashBalance,
                         nisaBalance,
                         totalAssets: cashBalance + nisaBalance,
-                        events: eventsForAge // 依頼1-1: yearlyDataに追加
+                        events: eventsForAge
                     });
                 }
                 
@@ -5535,13 +5533,11 @@
                      Utils.getElement('lifetimeChart').closest('.chart-section').querySelector('.nisa-legend').style.display = 'none';
                 }
 
-                // 依頼1-3: 注釈の生成ロジック
                 const annotations = {};
                 yearlyData.forEach((d, dataIndex) => {
                     if (d.events && d.events.length > 0) {
                         const xValue = labels[dataIndex];
                         
-                        // 縦線
                         annotations[`event-line-${d.age}`] = {
                             type: 'line',
                             xMin: xValue,
@@ -5551,7 +5547,6 @@
                             borderDash: [6, 6]
                         };
 
-                        // アイコンラベル
                         d.events.forEach((event, eventIndex) => {
                             annotations[`event-label-${d.age}-${eventIndex}`] = {
                                 type: 'label',
@@ -5563,7 +5558,7 @@
                                 font: {
                                     size: 16
                                 },
-                                yAdjust: -15 - (eventIndex * 30) // 重なりを避ける
+                                yAdjust: -15 - (eventIndex * 30)
                             };
                         });
                     }
@@ -5576,7 +5571,6 @@
                         maintainAspectRatio: false, 
                         plugins: { 
                             legend: { display: false },
-                            // 依頼1-3: 注釈プラグインの設定
                             annotation: {
                                 annotations: annotations
                             }
@@ -5591,9 +5585,8 @@
             },
             initWhatIf() {
                 const section = Utils.getElement('whatIfSection', false);
-                if (!section) return; // セクションがなければ何もしない
+                if (!section) return;
 
-                // ===== 依頼2-2: ここから修正 =====
                 const personality = appState.financialPersonality || 'security';
                 let title, description;
 
@@ -5621,19 +5614,17 @@
                 const descriptionEl = section.querySelector('.section-description');
                 
                 if (titleEl) {
-                    titleEl.innerHTML = title; // アイコンごと書き換える
+                    titleEl.innerHTML = title;
                 }
                 if (descriptionEl) {
                     descriptionEl.textContent = description;
                 }
-                // ===== 依頼2-2: ここまで修正 =====
 
                 const nisaControl = Utils.getElement('whatIfNisaControlItem');
                 const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
                 const nisaSlider = Utils.getElement('whatIfNisaSlider');
                 const resetButton = Utils.getElement('whatIfResetButton');
             
-                // NISAが選択されているかチェック
                 if (appState.lifeEvents.nisa) {
                     nisaControl.style.display = 'block';
                 } else {
@@ -5641,10 +5632,8 @@
                 }
                 section.style.display = 'block';
             
-                // 初期値をセット
                 this.resetWhatIf();
             
-                // イベントリスナー
                 fixedCostSlider.addEventListener('input', () => Utils.debounce('whatIf', () => this.updateWhatIf(), 150));
                 nisaSlider.addEventListener('input', () => Utils.debounce('whatIf', () => this.updateWhatIf(), 150));
                 resetButton.addEventListener('click', () => this.resetWhatIf());
@@ -5658,7 +5647,6 @@
                 const fixedCostAdjustment = Utils.parseNumber(fixedCostSlider.value);
                 const nisaAdjustment = appState.lifeEvents.nisa ? Utils.parseNumber(nisaSlider.value) : 0;
     
-                // スライダーの値表示を更新
                 fixedCostValueEl.textContent = `${fixedCostAdjustment.toFixed(1)}万円`;
                 if (appState.lifeEvents.nisa) {
                     nisaValueEl.textContent = `${nisaAdjustment.toFixed(1)}万円`;
@@ -5671,7 +5659,6 @@
     
                 const whatIfResults = CalculationEngine.performWhatIfCalculation(adjustments);
                 
-                // 結果表示を更新
                 const resultValueEl = Utils.getElement('whatIfResultValue');
                 const diffValueEl = Utils.getElement('whatIfDiffValue');
                 const originalFinalBalance = appState.results.finalBalance;
@@ -5681,7 +5668,6 @@
                 diffValueEl.textContent = `${diff >= 0 ? '+' : ''}${Utils.formatCurrency(diff)}`;
                 diffValueEl.className = `result-preview-value ${diff >= 0 ? 'positive' : 'negative'}`;
     
-                // グラフを更新 (発展的要件)
                 this.updateChartWithWhatIf(whatIfResults.yearlyData);
             },
             resetWhatIf() {
@@ -5695,16 +5681,15 @@
                 const whatIfDataset = {
                     label: 'もしもシミュレーション',
                     data: whatIfYearlyData.map(d => d.totalAssets),
-                    borderColor: 'rgba(239, 68, 68, 0.8)', // 赤色の点線
+                    borderColor: 'rgba(239, 68, 68, 0.8)',
                     backgroundColor: 'transparent',
                     borderDash: [5, 5],
                     pointRadius: 0,
                     fill: false,
                     tension: 0.3,
-                    order: -1 // 最前面に描画
+                    order: -1
                 };
     
-                // 既存のWhat-Ifデータセットを探す
                 const existingIndex = lifetimeChart.data.datasets.findIndex(ds => ds.label === 'もしもシミュレーション');
                 
                 const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
@@ -5723,7 +5708,7 @@
                     }
                 }
                 
-                lifetimeChart.update('none'); // アニメーションなしで更新
+                lifetimeChart.update('none');
             },
             renderAdvice() {
                 const container = Utils.getElement('adviceContent');
@@ -5741,7 +5726,6 @@
                 item.innerHTML = `<div>${msg}</div>`;
                 container.appendChild(item);
             },
-            // ===== 依頼2-1: ここから修正 =====
             getOverallAdvice() {
                 const { rating } = appState.results;
                 const personality = appState.financialPersonality || 'security';
@@ -5756,7 +5740,6 @@
                 const type = rating >= 'C' ? 'good' : 'warning';
                 return { type, msg: messages[rating] };
             },
-            // ===== 依頼2-1: ここまで修正 =====
             getPersonalityAdvice() {
                 const personality = appState.financialPersonality || 'security';
                 const messages = {
@@ -5861,6 +5844,9 @@
                 FormManager.restoreFormData();
                 
                 // 結果データがない場合は、必ずステップ1から開始
+                if                
+
+// 結果データがない場合は、必ずステップ1から開始
                 if (!appState.results || !appState.results.rating) {
                     appState.currentStep = 1;
                 }
