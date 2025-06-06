@@ -901,24 +901,48 @@ const CalculationEngine = {
         let yearlyData = [];
 
         for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
+            const eventsForAge = []; // 依頼1-1: eventsForAgeを宣言
             const isRetired = age >= retirementAge;
             const annualIncome = isRetired ? (totalPensionPerMonthInManYen * 12) : ((appState.basicInfo.income || 0) * 12);
             
             let annualCashExpense = Object.values(appState.fixedCosts).reduce((sum, cost) => sum + ((cost.amount || 0) * 12), 0);
             
             let eventCost = 0;
-            appState.customLifeEvents.forEach(e => { if(e.age === age) eventCost += e.amount; });
             
-            if (appState.lifeEvents.housing && age === appState.detailSettings.housingAge) {
-                eventCost += APP_DATA.lifeEvents.find(e=>e.key==='housing').cost;
+            // 依頼1-1: カスタムライフイベント
+            appState.customLifeEvents.forEach(e => {
+                if (e.age === age) {
+                    eventCost += e.amount;
+                    eventsForAge.push({ type: 'custom', label: e.name, icon: '🎉' });
+                }
+            });
+
+            // 依頼1-1: 主要ライフイベント
+            const marriageEvent = APP_DATA.lifeEvents.find(e => e.key === 'marriage');
+            if (appState.lifeEvents.marriage && age === (currentAge + 5)) {
+                eventCost += marriageEvent.cost;
+                eventsForAge.push({ type: 'marriage', label: '結婚', icon: marriageEvent.icon });
             }
+
+            const housingEvent = APP_DATA.lifeEvents.find(e => e.key === 'housing');
+            if (appState.lifeEvents.housing && age === appState.detailSettings.housingAge) {
+                eventCost += housingEvent.cost;
+                eventsForAge.push({ type: 'housing', label: '住宅購入', icon: housingEvent.icon });
+            }
+
             if(appState.lifeEvents.children && appState.detailSettings.childrenCount > 0) {
+                 const childrenEvent = APP_DATA.lifeEvents.find(e => e.key === 'children');
                  const firstChildBirthAge = Math.max((currentAge || 0) + 2, 30);
                  for (let i = 0; i < appState.detailSettings.childrenCount; i++) {
                     const childBirthAge = firstChildBirthAge + (i * 3);
+                    
+                    if(age === childBirthAge) {
+                        eventsForAge.push({ type: 'childbirth', label: `第${i+1}子誕生`, icon: childrenEvent.icon });
+                    }
+
                     const childsCurrentAge = age - childBirthAge;
                     if(childsCurrentAge >= 0 && childsCurrentAge < 22){
-                        eventCost += (APP_DATA.lifeEvents.find(e=>e.key==='children').cost / appState.detailSettings.childrenCount) / 22;
+                        eventCost += (childrenEvent.cost / appState.detailSettings.childrenCount) / 22;
                     }
                  }
             }
@@ -945,7 +969,8 @@ const CalculationEngine = {
                 netCashFlow,
                 cumulativeCash: cashBalance,
                 nisaBalance,
-                totalAssets: cashBalance + nisaBalance
+                totalAssets: cashBalance + nisaBalance,
+                events: eventsForAge // 依頼1-1: yearlyDataに追加
             });
         }
         
@@ -1093,9 +1118,59 @@ const ResultsManager = {
         } else {
              Utils.getElement('lifetimeChart').closest('.chart-section').querySelector('.nisa-legend').style.display = 'none';
         }
+
+        // 依頼1-3: 注釈の生成ロジック
+        const annotations = {};
+        yearlyData.forEach((d, dataIndex) => {
+            if (d.events && d.events.length > 0) {
+                const xValue = labels[dataIndex];
+                
+                // 縦線
+                annotations[`event-line-${d.age}`] = {
+                    type: 'line',
+                    xMin: xValue,
+                    xMax: xValue,
+                    borderColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [6, 6]
+                };
+
+                // アイコンラベル
+                d.events.forEach((event, eventIndex) => {
+                    annotations[`event-label-${d.age}-${eventIndex}`] = {
+                        type: 'label',
+                        xValue: xValue,
+                        yValue: d.totalAssets,
+                        content: event.icon,
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        borderRadius: 6,
+                        font: {
+                            size: 16
+                        },
+                        yAdjust: -15 - (eventIndex * 30) // 重なりを避ける
+                    };
+                });
+            }
+        });
+
         lifetimeChart = new Chart(ctx, {
             type: 'line', data: { labels, datasets },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { display: false },
+                    // 依頼1-3: 注釈プラグインの設定
+                    annotation: {
+                        annotations: annotations
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
         });
     },
     initWhatIf() {
@@ -1301,7 +1376,13 @@ const AppInitializer = {
         this.setupUI();
         QuickDiagnosticsManager.init();
         this.setupEventListeners();
-        UIManager.showQuickGuide();
+
+        // ダッシュボード表示制御
+        if (appState.results && appState.results.rating) {
+            this.setupDashboard();
+        } else {
+            UIManager.showQuickGuide();
+        }
     },
     loadData() {
         const saved = StorageManager.load();
@@ -1324,7 +1405,52 @@ const AppInitializer = {
         PensionManager.setupInputs();
         CustomEventManager.setup();
         FormManager.restoreFormData();
+        
+        // 結果データがない場合は、必ずステップ1から開始
+        if (!appState.results || !appState.results.rating) {
+            appState.currentStep = 1;
+        }
         UIManager.showStep(appState.currentStep);
+    },
+    setupDashboard() {
+        const dashboard = Utils.getElement('personalDashboard');
+        const quickDiagnostics = Utils.getElement('quickDiagnostics');
+        const mainContent = document.querySelectorAll('.main-step-tracker, .progress-section, .step-section');
+
+        if (!dashboard || !quickDiagnostics) return;
+
+        // データ描画
+        const { rating, finalBalance } = appState.results;
+        const ratingMap = {
+            'S': { class: 'rating-s' }, 'A': { class: 'rating-a' },
+            'B': { class: 'rating-b' }, 'C': { class: 'rating-c' },
+            'D': { class: 'rating-d' }
+        };
+        const ratingBadge = Utils.getElement('dashboardRating');
+        ratingBadge.textContent = rating;
+        ratingBadge.className = `rating-badge ${ratingMap[rating].class}`;
+        Utils.getElement('dashboardFinalAssets').textContent = Utils.formatCurrency(finalBalance);
+
+        // イベントリスナー設定
+        Utils.getElement('dashboardViewResults').addEventListener('click', () => {
+            dashboard.style.display = 'none';
+            mainContent.forEach(el => el.style.display = ''); // or 'block' etc.
+            UIManager.showStep(5);
+            ResultsManager.render();
+        });
+        Utils.getElement('dashboardEditSettings').addEventListener('click', () => {
+            dashboard.style.display = 'none';
+            mainContent.forEach(el => el.style.display = '');
+            UIManager.showStep(1);
+        });
+        Utils.getElement('dashboardReset').addEventListener('click', () => {
+            resetApp();
+        });
+
+        // 表示切り替え
+        dashboard.style.display = 'block';
+        quickDiagnostics.style.display = 'none';
+        mainContent.forEach(el => el.style.display = 'none');
     },
     setupEventListeners() {
         document.querySelectorAll('.step-label').forEach(l => l.addEventListener('click', () => NavigationManager.goToStep(Utils.parseInt(l.dataset.step))));
