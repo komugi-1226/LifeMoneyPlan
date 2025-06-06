@@ -5593,6 +5593,41 @@
                 const section = Utils.getElement('whatIfSection', false);
                 if (!section) return; // セクションがなければ何もしない
 
+                // ===== 依頼2-2: ここから修正 =====
+                const personality = appState.financialPersonality || 'security';
+                let title, description;
+
+                switch (personality) {
+                    case 'growth':
+                        title = `🎛️ 未来投資シミュレーション`;
+                        description = `節約した分を自己投資に回したら...？スライダーで未来の可能性を探ってみましょう。`;
+                        break;
+                    case 'freedom':
+                        title = `🎛️ 楽しみ両立シミュレーション`;
+                        description = `もっと趣味にお金を使っても大丈夫？スライダーで楽しみと貯蓄のベストバランスを見つけましょう。`;
+                        break;
+                    case 'contribution':
+                        title = `🎛️ 貢献プランニング`;
+                        description = `もしもの時の備えや、大切な人への贈り物を増やせるか確認してみましょう。`;
+                        break;
+                    case 'security':
+                    default:
+                        title = `🎛️ リスク確認シミュレーション`;
+                        description = `もし支出が増えたら...？スライダーで将来の安定度を確認してみましょう。`;
+                        break;
+                }
+
+                const titleEl = section.querySelector('.section-title');
+                const descriptionEl = section.querySelector('.section-description');
+                
+                if (titleEl) {
+                    titleEl.innerHTML = title; // アイコンごと書き換える
+                }
+                if (descriptionEl) {
+                    descriptionEl.textContent = description;
+                }
+                // ===== 依頼2-2: ここまで修正 =====
+
                 const nisaControl = Utils.getElement('whatIfNisaControlItem');
                 const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
                 const nisaSlider = Utils.getElement('whatIfNisaSlider');
@@ -5706,6 +5741,7 @@
                 item.innerHTML = `<div>${msg}</div>`;
                 container.appendChild(item);
             },
+            // ===== 依頼2-1: ここから修正 =====
             getOverallAdvice() {
                 const { rating } = appState.results;
                 const personality = appState.financialPersonality || 'security';
@@ -5720,6 +5756,7 @@
                 const type = rating >= 'C' ? 'good' : 'warning';
                 return { type, msg: messages[rating] };
             },
+            // ===== 依頼2-1: ここまで修正 =====
             getPersonalityAdvice() {
                 const personality = appState.financialPersonality || 'security';
                 const messages = {
@@ -5748,7 +5785,8 @@
                     <div class="breakdown-item">
                         <button class="breakdown-header" aria-expanded="false" aria-controls="breakdown-content-${age}">
                             <span>${age}歳時点</span>
-                            <svg class="arrow" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            <svg class="arrow" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 
+1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                         </button>
                         <div class="breakdown-content" id="breakdown-content-${age}">
                             <table class="breakdown-table">
