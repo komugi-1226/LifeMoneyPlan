@@ -589,16 +589,19 @@ const PensionManager = {
         FormManager.autoSave();
     },
     adjustByAge(age) {
+        if (!age) return;
         const npFuture = Utils.getElement('nationalPension予定Years');
         const epFuture = Utils.getElement('employeePension予定Years');
         const retirementAge = appState.advancedSettings.retirementAge;
 
         npFuture.max = Math.max(0, 60 - age);
         npFuture.value = Math.min(Utils.parseInt(npFuture.value), npFuture.max);
+        npFuture.dispatchEvent(new Event('input', { bubbles: true }));
         
         epFuture.max = Math.max(0, retirementAge - age);
         epFuture.value = Math.min(Utils.parseInt(epFuture.value), epFuture.max);
-        
+        epFuture.dispatchEvent(new Event('input', { bubbles: true }));
+
         this.calculate();
     },
     calculate() {
@@ -610,12 +613,19 @@ const PensionManager = {
         const avgReward = Math.min(Math.max(income * 1.35, 8.8), 65) * 10000;
         const epAmount = (epYears > 0 && income > 0) ? (avgReward * (5.481 / 1000) * (epYears * 12)) / 12 : 0;
 
-        Utils.getElement('nationalPensionAmount').textContent = `${Math.round(npAmount).toLocaleString()}円`;
-        Utils.getElement('employeePensionAmount').textContent = `${Math.round(epAmount).toLocaleString()}円`;
-        Utils.getElement('totalPensionAmount').textContent = `${Math.round(npAmount + epAmount).toLocaleString()}円`;
-        Utils.getElement('pensionEstimate').style.display = 'block';
+        // DOM要素の存在をチェックしてから更新する
+        const npAmountEl = Utils.getElement('nationalPensionAmount', false);
+        if (npAmountEl) npAmountEl.textContent = `${Math.round(npAmount).toLocaleString()}円`;
         
-        // ★★★ 修正点: 計算結果を返す ★★★
+        const epAmountEl = Utils.getElement('employeePensionAmount', false);
+        if (epAmountEl) epAmountEl.textContent = `${Math.round(epAmount).toLocaleString()}円`;
+
+        const totalAmountEl = Utils.getElement('totalPensionAmount', false);
+        if (totalAmountEl) totalAmountEl.textContent = `${Math.round(npAmount + epAmount).toLocaleString()}円`;
+
+        const pensionEstimateEl = Utils.getElement('pensionEstimate', false);
+        if (pensionEstimateEl) pensionEstimateEl.style.display = 'block';
+        
         return { npAmount, epAmount };
     }
 };
@@ -700,8 +710,10 @@ const LifeEventManager = {
     updateDetailSettingsVisibility() {
         APP_DATA.lifeEvents.forEach(event => {
             if (event.hasDetail) {
-                const group = Utils.getElement(event.detailSettingKey);
-                group.style.display = appState.lifeEvents[event.key] ? 'block' : 'none';
+                const group = Utils.getElement(event.detailSettingKey, false);
+                if (group) {
+                    group.style.display = appState.lifeEvents[event.key] ? 'block' : 'none';
+                }
             }
         });
     }
@@ -804,8 +816,17 @@ const StepValidator = {
     validateStep(stepNumber) {
         let isValid = true;
         const clearAndSetError = (id, message) => {
-            UIManager.clearError(id);
-            UIManager.showError(id, message);
+            const errorElement = Utils.getElement(`${id}Error`, false);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'flex'; // Changed from 'block' to 'flex' for better alignment
+            }
+            const inputElement = Utils.getElement(id, false);
+            if (inputElement) inputElement.classList.add('error');
+            else { // For radio buttons etc.
+                const groupElement = Utils.getElement(id, false);
+                if (groupElement) groupElement.classList.add('error');
+            }
             isValid = false;
         };
 
@@ -819,7 +840,7 @@ const StepValidator = {
             case 1:
                 if (!appState.financialPersonality) clearAndSetError('financialPersonality', '価値観を選択してください。');
                 if (!appState.basicInfo.birthday) clearAndSetError('birthDate', '生年月日を選択してください。');
-                if (!appState.basicInfo.income) clearAndSetError('income', '手取り収入を入力してください。');
+                if (appState.basicInfo.income === null || appState.basicInfo.income < 0) clearAndSetError('income', '有効な手取り収入を入力してください。');
                 if (!appState.basicInfo.occupation) clearAndSetError('occupation', '職業を選択してください。');
                 break;
         }
@@ -873,18 +894,17 @@ const CalculationEngine = {
         const { retirementAge, expectedLifeExpectancy, investmentReturnRate } = appState.advancedSettings;
         const invRate = investmentReturnRate / 100;
         
-        // ★★★ 修正点: PensionManager.calculate()から値を受け取る ★★★
         const pensionAmounts = PensionManager.calculate(); 
-        const totalPensionAmount = (pensionAmounts.npAmount || 0) + (pensionAmounts.epAmount || 0);
+        const totalPensionPerMonthInManYen = ((pensionAmounts.npAmount || 0) + (pensionAmounts.epAmount || 0)) / 10000;
 
         let cashBalance = 0, nisaBalance = 0, totalIncome = 0, totalExpenses = 0, nisaFinalContribution = 0;
         let yearlyData = [];
 
         for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
             const isRetired = age >= retirementAge;
-            const income = isRetired ? (totalPensionAmount * 12) : (appState.basicInfo.income * 12);
+            const annualIncome = isRetired ? (totalPensionPerMonthInManYen * 12) : ((appState.basicInfo.income || 0) * 12);
             
-            let cashExpense = Object.values(appState.fixedCosts).reduce((sum, cost) => sum + (cost.amount * 12), 0);
+            let annualCashExpense = Object.values(appState.fixedCosts).reduce((sum, cost) => sum + ((cost.amount || 0) * 12), 0);
             
             let eventCost = 0;
             appState.customLifeEvents.forEach(e => { if(e.age === age) eventCost += e.amount; });
@@ -893,31 +913,40 @@ const CalculationEngine = {
                 eventCost += APP_DATA.lifeEvents.find(e=>e.key==='housing').cost;
             }
             if(appState.lifeEvents.children && appState.detailSettings.childrenCount > 0) {
-                 const firstChildAge = Math.max(currentAge + 2, 30);
+                 const firstChildBirthAge = Math.max((currentAge || 0) + 2, 30);
                  for (let i = 0; i < appState.detailSettings.childrenCount; i++) {
-                    const childBirthAge = firstChildAge + (i * 3);
+                    const childBirthAge = firstChildBirthAge + (i * 3);
                     const childsCurrentAge = age - childBirthAge;
                     if(childsCurrentAge >= 0 && childsCurrentAge < 22){
                         eventCost += (APP_DATA.lifeEvents.find(e=>e.key==='children').cost / appState.detailSettings.childrenCount) / 22;
                     }
                  }
             }
-            cashExpense += eventCost;
+            annualCashExpense += eventCost;
 
-            let nisaInvestment = 0;
+            let annualNisaInvestment = 0;
             if (appState.lifeEvents.nisa && !isRetired) {
-                nisaInvestment = appState.detailSettings.nisaAmount * 12;
-                nisaFinalContribution += nisaInvestment;
+                annualNisaInvestment = (appState.detailSettings.nisaAmount || 0) * 12;
+                nisaFinalContribution += annualNisaInvestment;
             }
             
-            nisaBalance = (nisaBalance + nisaInvestment) * (1 + invRate);
-            const netCashFlow = income - cashExpense - nisaInvestment;
+            nisaBalance = (nisaBalance + annualNisaInvestment) * (1 + invRate);
+            const netCashFlow = annualIncome - annualCashExpense - annualNisaInvestment;
             cashBalance += netCashFlow;
 
-            totalIncome += income;
-            totalExpenses += cashExpense;
+            totalIncome += annualIncome;
+            totalExpenses += annualCashExpense;
 
-            yearlyData.push({ age, income, cashExpense, nisaInvestment, cumulativeCash: cashBalance, nisaBalance, totalAssets: cashBalance + nisaBalance });
+            yearlyData.push({
+                age,
+                income: annualIncome,
+                cashExpense: annualCashExpense,
+                nisaInvestment: annualNisaInvestment,
+                netCashFlow,
+                cumulativeCash: cashBalance,
+                nisaBalance,
+                totalAssets: cashBalance + nisaBalance
+            });
         }
         
         const finalBalance = cashBalance + nisaBalance;
@@ -927,6 +956,7 @@ const CalculationEngine = {
             totalIncome, totalExpenses, finalBalance,
             retirementAssets: retirementData ? retirementData.totalAssets : 0,
             nisaFinalContribution, nisaFinalBalance: nisaBalance,
+            pensionAmounts,
             yearlyData,
             rating: this.calculateRating(finalBalance, totalIncome, expectedLifeExpectancy - currentAge)
         };
@@ -939,6 +969,75 @@ const CalculationEngine = {
         if (finalBalance < (avgAnnualIncome * 2)) return 'B';
         if (finalBalance < (avgAnnualIncome * 5)) return 'A';
         return 'S';
+    },
+    performWhatIfCalculation(adjustments) {
+        // adjustments = { fixedCost: number, nisa: number } (単位は万円/月)
+        const currentAge = Utils.calculateAge(appState.basicInfo.birthday);
+        const { retirementAge, expectedLifeExpectancy, investmentReturnRate } = appState.advancedSettings;
+        const invRate = investmentReturnRate / 100;
+    
+        let pensionAmounts;
+        if (appState.results && appState.results.pensionAmounts) {
+            pensionAmounts = appState.results.pensionAmounts;
+        } else {
+            pensionAmounts = PensionManager.calculate();
+        }
+        const { npAmount, epAmount } = pensionAmounts;
+        const totalPensionPerMonthInManYen = ((npAmount || 0) + (epAmount || 0)) / 10000;
+    
+        let cashBalance = 0, nisaBalance = 0;
+        let yearlyData = [];
+    
+        const fixedCostMonthlyBase = Object.values(appState.fixedCosts).reduce((sum, cost) => sum + (cost.amount || 0), 0);
+        const fixedCostMonthlyAdjusted = fixedCostMonthlyBase + (adjustments.fixedCost || 0);
+    
+        const nisaMonthlyBase = (appState.lifeEvents.nisa) ? (appState.detailSettings.nisaAmount || 0) : 0;
+        const nisaMonthlyAdjusted = Math.max(0, nisaMonthlyBase + (adjustments.nisa || 0));
+    
+                for (let age = currentAge; age <= expectedLifeExpectancy; age++) {
+            const isRetired = age >= retirementAge;
+            const annualIncome = isRetired ? (totalPensionPerMonthInManYen * 12) : ((appState.basicInfo.income || 0) * 12);
+            
+            let annualCashExpense = fixedCostMonthlyAdjusted * 12;
+            
+            let eventCost = 0;
+            appState.customLifeEvents.forEach(e => { if(e.age === age) eventCost += e.amount; });
+            if (appState.lifeEvents.housing && age === appState.detailSettings.housingAge) {
+                eventCost += APP_DATA.lifeEvents.find(e => e.key === 'housing').cost;
+            }
+            if(appState.lifeEvents.children && appState.detailSettings.childrenCount > 0) {
+                 const firstChildBirthAge = Math.max(currentAge + 2, 30);
+                 for (let i = 0; i < appState.detailSettings.childrenCount; i++) {
+                    const childBirthAge = firstChildBirthAge + (i * 3);
+                    const childsCurrentAge = age - childBirthAge;
+                    if(childsCurrentAge >= 0 && childsCurrentAge < 22){
+                        eventCost += (APP_DATA.lifeEvents.find(e => e.key === 'children').cost / appState.detailSettings.childrenCount) / 22;
+                    }
+                 }
+            }
+            annualCashExpense += eventCost;
+    
+            let annualNisaInvestment = 0;
+            if (appState.lifeEvents.nisa && !isRetired) {
+                annualNisaInvestment = nisaMonthlyAdjusted * 12;
+            }
+            
+            nisaBalance = (nisaBalance + annualNisaInvestment) * (1 + invRate);
+            const netCashFlow = annualIncome - annualCashExpense - annualNisaInvestment;
+            cashBalance += netCashFlow;
+    
+            yearlyData.push({
+                age,
+                totalAssets: cashBalance + nisaBalance
+            });
+        }
+        
+        const finalBalance = cashBalance + nisaBalance;
+    
+        return {
+            finalBalance,
+            yearlyData
+        };
     }
 };
 
@@ -948,7 +1047,9 @@ const ResultsManager = {
         this.renderRatingAndSummary();
         this.renderSummaryCards();
         this.renderChart();
+        this.initWhatIf();
         this.renderAdvice();
+        this.renderBreakdown();
     },
     renderRatingAndSummary() {
         const { rating, finalBalance } = appState.results;
@@ -989,17 +1090,120 @@ const ResultsManager = {
         if (appState.lifeEvents.nisa) {
             datasets.push({ label: 'NISA評価額', data: yearlyData.map(d => d.nisaBalance), borderColor: 'rgba(16, 185, 129, 1)', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: false });
             Utils.getElement('lifetimeChart').closest('.chart-section').querySelector('.nisa-legend').style.display = 'flex';
+        } else {
+             Utils.getElement('lifetimeChart').closest('.chart-section').querySelector('.nisa-legend').style.display = 'none';
         }
         lifetimeChart = new Chart(ctx, {
             type: 'line', data: { labels, datasets },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     },
+    initWhatIf() {
+        const section = Utils.getElement('whatIfSection', false);
+        if (!section) return; // セクションがなければ何もしない
+
+        const nisaControl = Utils.getElement('whatIfNisaControlItem');
+        const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
+        const nisaSlider = Utils.getElement('whatIfNisaSlider');
+        const resetButton = Utils.getElement('whatIfResetButton');
+    
+        // NISAが選択されているかチェック
+        if (appState.lifeEvents.nisa) {
+            nisaControl.style.display = 'block';
+        } else {
+            nisaControl.style.display = 'none';
+        }
+        section.style.display = 'block';
+    
+        // 初期値をセット
+        this.resetWhatIf();
+    
+        // イベントリスナー
+        fixedCostSlider.addEventListener('input', () => Utils.debounce('whatIf', () => this.updateWhatIf(), 150));
+        nisaSlider.addEventListener('input', () => Utils.debounce('whatIf', () => this.updateWhatIf(), 150));
+        resetButton.addEventListener('click', () => this.resetWhatIf());
+    },
+    updateWhatIf() {
+        const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
+        const nisaSlider = Utils.getElement('whatIfNisaSlider');
+        const fixedCostValueEl = Utils.getElement('whatIfFixedCostValue');
+        const nisaValueEl = Utils.getElement('whatIfNisaValue');
+        
+        const fixedCostAdjustment = Utils.parseNumber(fixedCostSlider.value);
+        const nisaAdjustment = appState.lifeEvents.nisa ? Utils.parseNumber(nisaSlider.value) : 0;
+    
+        // スライダーの値表示を更新
+        fixedCostValueEl.textContent = `${fixedCostAdjustment.toFixed(1)}万円`;
+        if (appState.lifeEvents.nisa) {
+            nisaValueEl.textContent = `${nisaAdjustment.toFixed(1)}万円`;
+        }
+    
+        const adjustments = {
+            fixedCost: fixedCostAdjustment,
+            nisa: nisaAdjustment,
+        };
+    
+        const whatIfResults = CalculationEngine.performWhatIfCalculation(adjustments);
+        
+        // 結果表示を更新
+        const resultValueEl = Utils.getElement('whatIfResultValue');
+        const diffValueEl = Utils.getElement('whatIfDiffValue');
+        const originalFinalBalance = appState.results.finalBalance;
+        const diff = whatIfResults.finalBalance - originalFinalBalance;
+        
+        resultValueEl.textContent = Utils.formatCurrency(whatIfResults.finalBalance);
+        diffValueEl.textContent = `${diff >= 0 ? '+' : ''}${Utils.formatCurrency(diff)}`;
+        diffValueEl.className = `result-preview-value ${diff >= 0 ? 'positive' : 'negative'}`;
+    
+        // グラフを更新 (発展的要件)
+        this.updateChartWithWhatIf(whatIfResults.yearlyData);
+    },
+    resetWhatIf() {
+        Utils.getElement('whatIfFixedCostSlider').value = 0;
+        Utils.getElement('whatIfNisaSlider').value = 0;
+        this.updateWhatIf();
+    },
+    updateChartWithWhatIf(whatIfYearlyData) {
+        if (!lifetimeChart) return;
+    
+        const whatIfDataset = {
+            label: 'もしもシミュレーション',
+            data: whatIfYearlyData.map(d => d.totalAssets),
+            borderColor: 'rgba(239, 68, 68, 0.8)', // 赤色の点線
+            backgroundColor: 'transparent',
+            borderDash: [5, 5],
+            pointRadius: 0,
+            fill: false,
+            tension: 0.3,
+            order: -1 // 最前面に描画
+        };
+    
+        // 既存のWhat-Ifデータセットを探す
+        const existingIndex = lifetimeChart.data.datasets.findIndex(ds => ds.label === 'もしもシミュレーション');
+        
+        const fixedCostSlider = Utils.getElement('whatIfFixedCostSlider');
+        const nisaSlider = Utils.getElement('whatIfNisaSlider');
+        const isReset = parseFloat(fixedCostSlider.value) === 0 && (!appState.lifeEvents.nisa || parseFloat(nisaSlider.value) === 0);
+    
+        if (isReset) {
+            if (existingIndex !== -1) {
+                lifetimeChart.data.datasets.splice(existingIndex, 1);
+            }
+        } else {
+            if (existingIndex !== -1) {
+                lifetimeChart.data.datasets[existingIndex] = whatIfDataset;
+            } else {
+                lifetimeChart.data.datasets.push(whatIfDataset);
+            }
+        }
+        
+        lifetimeChart.update('none'); // アニメーションなしで更新
+    },
     renderAdvice() {
         const container = Utils.getElement('adviceContent');
         container.innerHTML = '';
         this._addAdvice(container, this.getOverallAdvice());
-        if (Object.values(appState.fixedCosts).reduce((s, c) => s + c.amount, 0) > (appState.basicInfo.income * 0.5))
+        if (Object.values(appState.fixedCosts).reduce((s, c) => s + (c.amount || 0), 0) > ((appState.basicInfo.income || 0) * 0.5))
             this._addAdvice(container, { type: 'warning', msg: '<strong>固定費:</strong> 収入に対する固定費の割合が50%を超えています。家計の見直しを強く推奨します。' });
         if (!appState.lifeEvents.nisa)
             this._addAdvice(container, { type: 'info', msg: '<strong>投資:</strong> NISAなどの積立投資が計画に含まれていません。インフレ対策として少額からでも始めることを検討しましょう。' });
@@ -1034,6 +1238,47 @@ const ResultsManager = {
             contribution: `<strong>あなたへ (貢献・家族型):</strong> 大切な人との時間を守るための計画ができています。家族や社会への想いを形にするため、生命保険や相続対策、寄付なども視野に入れてみましょう。`
         };
         return { type: 'info', msg: messages[personality] };
+    },
+    renderBreakdown() {
+        const container = Utils.getElement('detailedBreakdownContainer');
+        const button = Utils.getElement('toggleBreakdownButton');
+        if (!appState.results.yearlyData || appState.results.yearlyData.length === 0) {
+            button.style.display = 'none';
+            return;
+        }
+
+        button.style.display = 'inline-flex';
+        container.innerHTML = appState.results.yearlyData.map(data => this.createBreakdownItem(data)).join('');
+    },
+    createBreakdownItem(data) {
+        const { age, income, cashExpense, nisaInvestment, netCashFlow, cumulativeCash, nisaBalance, totalAssets } = data;
+        
+        return `
+            <div class="breakdown-item">
+                <button class="breakdown-header" aria-expanded="false" aria-controls="breakdown-content-${age}">
+                    <span>${age}歳時点</span>
+                    <svg class="arrow" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+                <div class="breakdown-content" id="breakdown-content-${age}">
+                    <table class="breakdown-table">
+                        <tbody>
+                            <tr><th>年間収入</th><td class="positive">${Utils.formatCurrency(income)}</td></tr>
+                            <tr><th>年間支出</th><td class="negative">-${Utils.formatCurrency(cashExpense)}</td></tr>
+                            <tr><th>NISA積立額</th><td>-${Utils.formatCurrency(nisaInvestment)}</td></tr>
+                            <tr>
+                                <th>年間キャッシュフロー</th>
+                                <td class="${netCashFlow >= 0 ? 'positive' : 'negative'}">
+                                    ${netCashFlow >= 0 ? '+' : ''}${Utils.formatCurrency(netCashFlow)}
+                                </td>
+                            </tr>
+                            <tr class="total"><th>年末総資産</th><td>${Utils.formatCurrency(totalAssets)}</td></tr>
+                            <tr><th>(内訳) 現金残高</th><td>${Utils.formatCurrency(cumulativeCash)}</td></tr>
+                            <tr><th>(内訳) NISA評価額</th><td>${Utils.formatCurrency(nisaBalance)}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
     }
 };
 
@@ -1093,6 +1338,42 @@ const AppInitializer = {
                 const el = Utils.getElement(id, false);
                 if (el) el.addEventListener('input', () => FormManager.saveCurrentStepData());
             });
+        
+        // Event listener for breakdown accordion
+        const breakdownButton = Utils.getElement('toggleBreakdownButton');
+        const breakdownContainer = Utils.getElement('detailedBreakdownContainer');
+        breakdownButton.addEventListener('click', () => {
+            const isOpen = breakdownButton.classList.toggle('open');
+            breakdownContainer.style.display = isOpen ? 'block' : 'none';
+        });
+
+        breakdownContainer.addEventListener('click', (e) => {
+            const header = e.target.closest('.breakdown-header');
+            if (!header) return;
+
+            const content = header.nextElementSibling;
+            const isOpening = !header.classList.contains('open');
+
+            // Close all other items
+            breakdownContainer.querySelectorAll('.breakdown-header.open').forEach(openHeader => {
+                if (openHeader !== header) {
+                    openHeader.classList.remove('open');
+                    openHeader.setAttribute('aria-expanded', 'false');
+                    openHeader.nextElementSibling.classList.remove('open');
+                    openHeader.nextElementSibling.style.maxHeight = '0';
+                }
+            });
+
+            // Toggle current item
+            header.classList.toggle('open', isOpening);
+            header.setAttribute('aria-expanded', isOpening);
+            content.classList.toggle('open', isOpening);
+            if (isOpening) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                content.style.maxHeight = '0';
+            }
+        });
     }
 };
 
